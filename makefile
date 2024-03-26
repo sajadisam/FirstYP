@@ -29,6 +29,7 @@ OBJECT_FILES := $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
+	mkdir -p $(@D)
 	@echo file: $(LIBS)
 	$(CC) $(CFLAGS) $^ -o $@
 
