@@ -1,5 +1,3 @@
-LIBS := ""
-
 ifeq ($(OS), Windows_NT) 
 	INCLUDE = C:\msys64\mingw64\include\SDL2
 	LDFLAGS = -lmingw32 -lSDL2main  -lSDL2 -mwindows -lm
@@ -11,7 +9,7 @@ else
 	endif
 	ifeq ($(UNAME_S), Darwin)
 		INCLUDE = /opt/homebrew/include
-		LIBS = /opt/homebrew/lib
+		LIBS := -L /opt/homebrew/lib
 		LDFLAGS = -lSDL2main -lSDL2 
 	endif
 endif
@@ -31,12 +29,12 @@ OBJECT_FILES := $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
-	@echo file: $^
-	$(CC) $(CFLAGS) $^ -o $@ -L $(LIBS)
+	@echo file: $(LIBS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 # Build the binary by linking the intermediate files
 $(OBJ): $(OBJECT_FILES)
-	$(CC) $^ -o bin/$(OBJ) $(LDFLAGS)
+	$(CC) $^ -o bin/$(OBJ) $(LDFLAGS) $(LIBS)
 
 
 clean:
