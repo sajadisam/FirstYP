@@ -163,7 +163,7 @@ int main(int argv, char **args) {
           left = false;
           break;
         case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN:
+        case SDL_SCANCODE_DOWN: //Hej
           down = false;
           break;
         case SDL_SCANCODE_D:
