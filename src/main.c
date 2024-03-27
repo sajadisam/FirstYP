@@ -16,6 +16,7 @@ bool CheckCollision(SDL_Rect a, SDL_Rect b) {
          (a.y < b.y + b.h);
 }
 
+// From Ishar
 int main(int argv, char **args) {
   srand(time(NULL));
   bool newImageVisible = true;
