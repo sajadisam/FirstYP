@@ -34,7 +34,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 
 # Build the binary by linking the intermediate files
 $(OBJ): $(OBJECT_FILES)
-	$(CC) $^ -o bin/$(OBJ) $(LDFLAGS) $(LIBS)
+	$(CC) $^ -o $(OBJ) $(LDFLAGS) $(LIBS)
 
 
 clean:
