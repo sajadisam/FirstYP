@@ -18,6 +18,7 @@ bool CheckCollision(SDL_Rect a, SDL_Rect b) {
 // From Ishar
 int main(int argv, char **args) {
   int SPEED = 100;
+  int mobSPEED = 1;
   srand(time(NULL));
   bool newImageVisible = true;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -120,23 +121,23 @@ int main(int argv, char **args) {
     return 1;
   }
 
-
-
   int textureWidth, textureHeight, frameWidth, frameHeight;
   int frameTime = 0;
+  int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
   int newY = rand() % WINDOW_HEIGHT;
   SDL_Rect playerRect;
   SDL_Rect playerPosition;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+  SDL_Rect mobRect;
+  SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50, 50};
 
   playerPosition.x = playerPosition.y = 0;
   playerPosition.w = playerPosition.h = 12;
 
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
-
-  // Assuming the sprite sheet has frames placed horizontally
+  SDL_QueryTexture(mobTexture, NULL, NULL, &textureWidth, &textureHeight);
 
   frameWidth = textureWidth / 3;
   frameHeight = textureHeight / 4;
@@ -145,6 +146,11 @@ int main(int argv, char **args) {
   playerRect.w = frameWidth;
   playerRect.h = frameHeight;
 
+  mobRect.x = mobRect.y = 0;
+  mobRect.w = frameWidth;
+  mobRect.h = frameHeight;
+
+
   int frame = 0;
   bool running = true;
 
@@ -152,7 +158,7 @@ int main(int argv, char **args) {
   playerPosition.y = (WINDOW_HEIGHT - frameHeight) / 2; // upper side
   playerPosition.w = frameWidth;
   playerPosition.h = frameHeight;
-  float playerVelocityX = 0; // unit: pixels/s
+  float playerVelocityX = 0; 
   float playerVelocityY = 0;
 
   bool closeWindow = false;
@@ -207,7 +213,7 @@ int main(int argv, char **args) {
           left = false;
           break;
         case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN: //Hej
+        case SDL_SCANCODE_DOWN: 
           down = false;
           break;
         case SDL_SCANCODE_D:
@@ -218,7 +224,6 @@ int main(int argv, char **args) {
         break;
       }
     }
-
     frameTime++;
 
     if (frameTime == 5) {
@@ -227,6 +232,14 @@ int main(int argv, char **args) {
       if (playerRect.x >= textureWidth)
         playerRect.x = 0;
     }
+
+  mobFrameTime++;
+  if (mobFrameTime >= (FPS / 2)) {
+    mobFrameTime = 0;
+    frame = (frame + 1) % 3; 
+    mobRect.x = frame * frameWidth;
+  }
+    
 
     playerVelocityX = playerVelocityY = 0;
     if (up && !down)
@@ -237,33 +250,53 @@ int main(int argv, char **args) {
       playerVelocityX = -SPEED;
     if (right && !left)
       playerVelocityX = SPEED;
-    playerPosition.x += playerVelocityX / 60; // Adjust SPEED definition to be float for smooth movement
+    playerPosition.x += playerVelocityX / 60; 
     playerPosition.y += playerVelocityY / 60;
 
     float newPlayerX = playerPosition.x + playerVelocityX / FPS;
     float newPlayerY = playerPosition.y + playerVelocityY / FPS;
 
-    // Constrain the new position within the window's boundaries
+    int deltaX = playerPosition.x - mobPosition.x;
+    int deltaY = playerPosition.y - mobPosition.y;
+    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+    float dirX = deltaX / distance;
+    float dirY = deltaY / distance;
+
+    int mobCurrentRow = 0;
+
+    if (distance > 1) { 
+      dirX = deltaX / distance;
+      dirY = deltaY / distance;
+      mobPosition.x += dirX * mobSPEED;
+      mobPosition.y += dirY * mobSPEED;
+   
+       if (fabs(dirX) > fabs(dirY)) {
+            mobCurrentRow = (dirX > 0) ? 2 : 1; // Right or Left
+        } else {
+            mobCurrentRow = (dirY > 0) ? 0 : 3; // Down or Up
+        }
+        mobRect.y = mobCurrentRow * frameHeight;
+    }
+    
     if (newPlayerX < 0) {
-      newPlayerX = 0; // Left boundary
+      newPlayerX = 0; 
     } else if (newPlayerX + playerPosition.w > WINDOW_WIDTH) {
-      newPlayerX = WINDOW_WIDTH - playerPosition.w; // Right boundary
+      newPlayerX = WINDOW_WIDTH - playerPosition.w; 
     }
 
     if (newPlayerY < 0) {
-      newPlayerY = 0; // Top boundary
+      newPlayerY = 0; 
     } else if (newPlayerY + playerPosition.h > WINDOW_HEIGHT) {
-      newPlayerY = WINDOW_HEIGHT - playerPosition.h; // Bottom boundary
+      newPlayerY = WINDOW_HEIGHT - playerPosition.h; 
     }
 
-    // Update player position
     playerPosition.x = newPlayerX;
     playerPosition.y = newPlayerY;
 
     SDL_RenderClear(pRenderer);
     SDL_RenderCopy(pRenderer, mapTexture, NULL, &mapRect);
-    SDL_RenderCopy(pRenderer, pTexture, &playerRect,
-                   &playerPosition); // Render the current frame
+    SDL_RenderCopy(pRenderer, mobTexture, &mobRect, &mobPosition);
+    SDL_RenderCopy(pRenderer, pTexture, &playerRect, &playerPosition); 
     if (newImageVisible) {
       SDL_RenderCopy(pRenderer, newTexture, NULL, &newImagePosition);
     }
