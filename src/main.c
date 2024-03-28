@@ -5,7 +5,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define SPEED 100
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 400
 #define FRAME_DELAY_MS 100
@@ -17,6 +16,7 @@ bool CheckCollision(SDL_Rect a, SDL_Rect b) {
 }
 
 int main(int argv, char **args) {
+  int SPEED = 100;
   srand(time(NULL));
   bool newImageVisible = true;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -193,10 +193,8 @@ int main(int argv, char **args) {
       playerVelocityX = -SPEED;
     if (right && !left)
       playerVelocityX = SPEED;
-    playerPosition.x +=
-        playerVelocityX /
-        40; // Adjust SPEED definition to be float for smooth movement
-    playerPosition.y += playerVelocityY / 40;
+    playerPosition.x += playerVelocityX / 60; // Adjust SPEED definition to be float for smooth movement
+    playerPosition.y += playerVelocityY / 60;
 
     float newPlayerX = playerPosition.x + playerVelocityX / FPS;
     float newPlayerY = playerPosition.y + playerVelocityY / FPS;
@@ -226,6 +224,7 @@ int main(int argv, char **args) {
     }
     if (CheckCollision(playerPosition, newImagePosition) && newImageVisible) {
       newImageVisible = false;
+      SPEED *= 3;
     }
     SDL_RenderPresent(pRenderer);
     SDL_Delay(16);
