@@ -42,7 +42,7 @@ int main(int argv, char **args) {
     return 1;
   }
 
-  /**/ SDL_Surface *pSurface = IMG_Load("./resources/hejsan.png");
+  SDL_Surface *pSurface = IMG_Load("./resources/player.png");
   if (!pSurface) {
     printf("Error: %s\n", SDL_GetError());
     SDL_DestroyRenderer(pRenderer);
@@ -60,7 +60,7 @@ int main(int argv, char **args) {
     return 1;
   }
 
-  SDL_Surface *newSurface = IMG_Load("./resources/Ship.png");
+  SDL_Surface *newSurface = IMG_Load("./resources/redGem.png");
   if (!newSurface) {
     printf("Unable to load image %s! SDL_image Error: %s\n",
            "resources/ship.png", IMG_GetError());
@@ -69,6 +69,7 @@ int main(int argv, char **args) {
     SDL_Quit();
     return 1;
   }
+
   SDL_Texture *newTexture = SDL_CreateTextureFromSurface(pRenderer, newSurface);
   SDL_FreeSurface(newSurface);
   if (!newTexture) {
@@ -80,13 +81,55 @@ int main(int argv, char **args) {
     return 1;
   }
 
+  SDL_Surface *mapSurface = IMG_Load("./resources/Map.png");
+  if (!mapSurface) {
+    printf("Unable to load image %s! SDL_image Error: %s\n",
+           "resources/map.png", IMG_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+
+  SDL_Texture *mapTexture = SDL_CreateTextureFromSurface(pRenderer, mapSurface);
+  SDL_FreeSurface(mapSurface);
+  if (!mapTexture) {
+    printf("Unable to create texture from %s! SDL Error: %s\n",
+           "resources/ship.png", SDL_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+
+  SDL_Surface *mobSurface = IMG_Load("./resources/mob.png");
+  if (!mobSurface) {
+    printf("Error: %s\n", SDL_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+  SDL_Texture *mobTexture = SDL_CreateTextureFromSurface(pRenderer, mobSurface);
+  SDL_FreeSurface(mobSurface);
+  if (!mobTexture) {
+    printf("Error: %s\n", SDL_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+
+
+
   int textureWidth, textureHeight, frameWidth, frameHeight;
   int frameTime = 0;
-  float newX = rand() % WINDOW_WIDTH;
-  float newY = rand() % WINDOW_HEIGHT;
+  int newX = rand() % WINDOW_WIDTH;
+  int newY = rand() % WINDOW_HEIGHT;
   SDL_Rect playerRect;
   SDL_Rect playerPosition;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
+  SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
 
   playerPosition.x = playerPosition.y = 0;
   playerPosition.w = playerPosition.h = 12;
@@ -218,6 +261,7 @@ int main(int argv, char **args) {
     playerPosition.y = newPlayerY;
 
     SDL_RenderClear(pRenderer);
+    SDL_RenderCopy(pRenderer, mapTexture, NULL, &mapRect);
     SDL_RenderCopy(pRenderer, pTexture, &playerRect,
                    &playerPosition); // Render the current frame
     if (newImageVisible) {
