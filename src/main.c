@@ -15,6 +15,7 @@ bool CheckCollision(SDL_Rect a, SDL_Rect b) {
          (a.y < b.y + b.h);
 }
 
+// From Ishar
 int main(int argv, char **args) {
   int SPEED = 100;
   srand(time(NULL));
