@@ -9,16 +9,80 @@
 #define WINDOW_HEIGHT 400
 #define FRAME_DELAY_MS 100
 #define FPS 60
+#define MAX_ARROWS 10
+#define ARROW_SPEED 200
+
+typedef struct {
+    SDL_Rect position;
+    float velocityX;
+    float velocityY;
+    bool active;
+} Arrow;
 
 bool CheckCollision(SDL_Rect a, SDL_Rect b) {
   return (a.x + a.w > b.x) && (a.x < b.x + b.w) && (a.y + a.h > b.y) &&
          (a.y < b.y + b.h);
 }
 
-// From Ishar
+void initArrows(Arrow *arrows) {
+    for (int i = 0; i < MAX_ARROWS; i++) {
+        arrows[i].active = false;
+    }
+}
+
+void shootArrow(int playerX, int playerY, int direction, Arrow *arrows) {
+    for (int i = 0; i < MAX_ARROWS; i++) {
+        if (!arrows[i].active) {
+            arrows[i].position.x = playerX;
+            arrows[i].position.y = playerY;
+            arrows[i].active = true;
+            switch (direction) {
+                case 0: // Down
+                    arrows[i].velocityX = 0;
+                    arrows[i].velocityY = ARROW_SPEED;
+                    break;
+                case 1: // Left
+                    arrows[i].velocityX = -ARROW_SPEED;
+                    arrows[i].velocityY = 0;
+                    break;
+                case 2: // Right
+                    arrows[i].velocityX = ARROW_SPEED;
+                    arrows[i].velocityY = 0;
+                    break;
+                case 3: // Up
+                    arrows[i].velocityX = 0;
+                    arrows[i].velocityY = -ARROW_SPEED;
+                    break;
+            }
+            break; // Exit after activating an arrow
+        }
+    }
+}
+
+void updateArrows(Arrow *arrows,int deltaTime) {
+    for (int i = 0; i < MAX_ARROWS; i++) {
+        if (arrows[i].active) {
+            arrows[i].position.x += arrows[i].velocityX * deltaTime;
+            arrows[i].position.y += arrows[i].velocityY * deltaTime;
+
+            // Check if the arrow is off-screen, then deactivate
+            if (arrows[i].position.x < 0 || arrows[i].position.x > WINDOW_WIDTH ||
+                arrows[i].position.y < 0 || arrows[i].position.y > WINDOW_HEIGHT) {
+                arrows[i].active = false;
+            }
+        }
+    }
+}
+
 int main(int argv, char **args) {
   int SPEED = 100;
   int mobSPEED = 1;
+  printf("Attempting to shoot an arrow...\n");
+fflush(stdout); // Ensure the output is immediately printed
+ 
+  Arrow arrows[MAX_ARROWS];  
+  float arrowShootTimer = 0;
+  float arrowShootInterval = 2.0;  
   srand(time(NULL));
   bool newImageVisible = true;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -121,6 +185,28 @@ int main(int argv, char **args) {
     return 1;
   }
 
+  SDL_Surface *arrowSurface = IMG_Load("./resources/arrow.png");
+  if (!mobSurface) {
+    printf("Error: %s\n", SDL_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+
+  SDL_Texture *arrowTexture = SDL_CreateTextureFromSurface(pRenderer, arrowSurface);
+  SDL_FreeSurface(arrowSurface);
+  if (!mobTexture) {
+    printf("Error: %s\n", SDL_GetError());
+    SDL_DestroyRenderer(pRenderer);
+    SDL_DestroyWindow(pWindow);
+    SDL_Quit();
+    return 1;
+  }
+  initArrows(arrows);
+  Uint32 startTick = SDL_GetTicks(), endTick, deltaTime;
+  
+  
   int textureWidth, textureHeight, frameWidth, frameHeight;
   int frameTime = 0;
   int mobFrameTime = 0;
@@ -239,6 +325,10 @@ int main(int argv, char **args) {
     frame = (frame + 1) % 3; 
     mobRect.x = frame * frameWidth;
   }
+  endTick = SDL_GetTicks();
+  deltaTime = (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
+  startTick = endTick;
+
     
 
     playerVelocityX = playerVelocityY = 0;
@@ -258,11 +348,25 @@ int main(int argv, char **args) {
 
     int deltaX = playerPosition.x - mobPosition.x;
     int deltaY = playerPosition.y - mobPosition.y;
+    if (deltaX != 0) {
+    mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
+    }
+
+    if (deltaY != 0) {
+    mobPosition.y += (deltaY > 0 ? mobSPEED : -mobSPEED);
+    }
     float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
     float dirX = deltaX / distance;
     float dirY = deltaY / distance;
 
+
     int mobCurrentRow = 0;
+    updateArrows(arrows, deltaTime);
+    arrowShootTimer -= deltaTime;
+    if (arrowShootTimer <= 0) {
+    shootArrow(playerPosition.x, playerPosition.y, currentRow, arrows); // Shoot an arrow
+    arrowShootTimer = arrowShootInterval; // Reset the timer
+    }
 
     if (distance > 1) { 
       dirX = deltaX / distance;
@@ -297,6 +401,12 @@ int main(int argv, char **args) {
     SDL_RenderCopy(pRenderer, mapTexture, NULL, &mapRect);
     SDL_RenderCopy(pRenderer, mobTexture, &mobRect, &mobPosition);
     SDL_RenderCopy(pRenderer, pTexture, &playerRect, &playerPosition); 
+    for (int i = 0; i < MAX_ARROWS; i++) {
+        if (arrows[i].active) {
+          printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].position.x, arrows[i].position.y);
+            SDL_RenderCopy(pRenderer, arrowTexture, NULL, &arrows[i].position);
+        }
+    }
     if (newImageVisible) {
       SDL_RenderCopy(pRenderer, newTexture, NULL, &newImagePosition);
     }
