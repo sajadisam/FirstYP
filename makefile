@@ -1,6 +1,6 @@
 ifeq ($(OS), Windows_NT) 
 	INCLUDE = C:\msys64\mingw64\include\SDL2
-	LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image  -lSDL2 -mwindows -lm
+	LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2 -mwindows -mconsole -lm
 	LIBS := -L C:\msys64\mingw64\lib
 else 
 	UNAME_S := $(shell uname -s)
