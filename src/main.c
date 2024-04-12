@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 400
+#define WINDOW_WIDTH 1280
+#define WINDOW_HEIGHT 1024
 #define FRAME_DELAY_MS 100
 #define FPS 60
 #define MAX_ARROWS 10
@@ -78,8 +78,6 @@ int main(int argv, char **args) {
   int SPEED = 100;
   int mobSPEED = 1;
   printf("Attempting to shoot an arrow...\n");
-fflush(stdout); // Ensure the output is immediately printed
- 
   Arrow arrows[MAX_ARROWS];  
   float arrowShootTimer = 0;
   float arrowShootInterval = 2.0;  
