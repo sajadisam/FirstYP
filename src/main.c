@@ -35,6 +35,8 @@ void shootArrow(int playerX, int playerY, int direction, Arrow *arrows) {
         if (!arrows[i].active) {
             arrows[i].position.x = playerX;
             arrows[i].position.y = playerY;
+            arrows[i].position.w = 50; // Set the width of the arrow
+            arrows[i].position.h = 50;
             arrows[i].active = true;
             switch (direction) {
                 case 0: // Down
@@ -62,14 +64,14 @@ void shootArrow(int playerX, int playerY, int direction, Arrow *arrows) {
 void updateArrows(Arrow *arrows,int deltaTime) {
     for (int i = 0; i < MAX_ARROWS; i++) {
         if (arrows[i].active) {
-            arrows[i].position.x += arrows[i].velocityX * deltaTime;
-            arrows[i].position.y += arrows[i].velocityY * deltaTime;
+            arrows[i].position.x = (int)(arrows[i].position.x + arrows[i].velocityX * deltaTime);
+            arrows[i].position.y = (int)(arrows[i].position.y + arrows[i].velocityY * deltaTime);
 
             // Check if the arrow is off-screen, then deactivate
             if (arrows[i].position.x < 0 || arrows[i].position.x > WINDOW_WIDTH ||
                 arrows[i].position.y < 0 || arrows[i].position.y > WINDOW_HEIGHT) {
                 arrows[i].active = false;
-            }
+          }
         }
     }
 }
@@ -77,10 +79,10 @@ void updateArrows(Arrow *arrows,int deltaTime) {
 int main(int argv, char **args) {
   int SPEED = 100;
   int mobSPEED = 1;
-  printf("Attempting to shoot an arrow...\n");
   Arrow arrows[MAX_ARROWS];  
   float arrowShootTimer = 0;
   float arrowShootInterval = 2.0;  
+  initArrows(arrows);
   srand(time(NULL));
   bool newImageVisible = true;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -184,7 +186,7 @@ int main(int argv, char **args) {
   }
 
   SDL_Surface *arrowSurface = IMG_Load("./resources/arrow.png");
-  if (!mobSurface) {
+  if (!arrowSurface) {
     printf("Error: %s\n", SDL_GetError());
     SDL_DestroyRenderer(pRenderer);
     SDL_DestroyWindow(pWindow);
@@ -194,14 +196,13 @@ int main(int argv, char **args) {
 
   SDL_Texture *arrowTexture = SDL_CreateTextureFromSurface(pRenderer, arrowSurface);
   SDL_FreeSurface(arrowSurface);
-  if (!mobTexture) {
+  if (!arrowTexture) {
     printf("Error: %s\n", SDL_GetError());
     SDL_DestroyRenderer(pRenderer);
     SDL_DestroyWindow(pWindow);
     SDL_Quit();
     return 1;
   }
-  initArrows(arrows);
   Uint32 startTick = SDL_GetTicks(), endTick, deltaTime;
   
   
@@ -216,6 +217,7 @@ int main(int argv, char **args) {
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
   SDL_Rect mobRect;
   SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50, 50};
+  
 
   playerPosition.x = playerPosition.y = 0;
   playerPosition.w = playerPosition.h = 12;
@@ -324,7 +326,7 @@ int main(int argv, char **args) {
     mobRect.x = frame * frameWidth;
   }
   endTick = SDL_GetTicks();
-  deltaTime = (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
+  deltaTime = (endTick - startTick); // Convert milliseconds to seconds
   startTick = endTick;
 
     
@@ -401,8 +403,8 @@ int main(int argv, char **args) {
     SDL_RenderCopy(pRenderer, pTexture, &playerRect, &playerPosition); 
     for (int i = 0; i < MAX_ARROWS; i++) {
         if (arrows[i].active) {
-          printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].position.x, arrows[i].position.y);
-            SDL_RenderCopy(pRenderer, arrowTexture, NULL, &arrows[i].position);
+         printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].position.x, arrows[i].position.y);
+         SDL_RenderCopy(pRenderer, arrowTexture, NULL, &arrows[i].position);
         }
     }
     if (newImageVisible) {
