@@ -1,3 +1,4 @@
+#include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
@@ -155,10 +156,6 @@ int main(int argv, char **args) {
   float arrowShootInterval = 2.0;
   srand(time(NULL));
   bool newImageVisible = true;
-  if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    printf("Error: %s\n", SDL_GetError());
-    return 1;
-  }
 
   if (TTF_Init() != 0) {
     printf("Error initializing SDL_ttf: %s\n", TTF_GetError());
@@ -172,44 +169,20 @@ int main(int argv, char **args) {
   if (!pWindow) {
     printf("Error: %s\n", SDL_GetError());
     SDL_Quit();
+  if (Window_IntitializeSDL())
     return 1;
-  }
-  SDL_Renderer *pRenderer = SDL_CreateRenderer(
-      pWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-  if (!pRenderer) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
 
-  SDL_Surface *pSurface = IMG_Load("./resources/player.png");
-  if (!pSurface) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-  SDL_Texture *pTexture = SDL_CreateTextureFromSurface(pRenderer, pSurface);
-  SDL_FreeSurface(pSurface);
-  if (!pTexture) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
+  Window *wnd = Window_Create("Spel", WINDOW_WIDTH, WINDOW_HEIGHT);
+  if (!wnd)
+    return 2;
 
-  SDL_Surface *newSurface = IMG_Load("./resources/redGem.png");
-  if (!newSurface) {
-    printf("Unable to load image %s! SDL_image Error: %s\n",
-           "resources/ship.png", IMG_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
+  SDL_Window *pWindow = wnd->m_Window;
+  SDL_Renderer *pRenderer = wnd->m_Renderer;
+  SDL_Texture *pTexture = Window_Texture("./resources/player.png", wnd);
+  SDL_Texture *newTexture = Window_Texture("./resources/redGem.png", wnd);
+  SDL_Texture *mapTexture = Window_Texture("./resources/Map.png", wnd);
+  SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
+  SDL_Texture *arrowTexture = Window_Texture("./resources/arrow.png", wnd);
 
   SDL_Texture *newTexture = SDL_CreateTextureFromSurface(pRenderer, newSurface);
   SDL_FreeSurface(newSurface);
@@ -399,8 +372,8 @@ int main(int argv, char **args) {
         break;
       }
     }
-    frameTime++;
 
+    frameTime++;
     if (frameTime == 5) {
       frameTime = 0;
       playerRect.x += frameWidth;
@@ -522,6 +495,7 @@ int main(int argv, char **args) {
   SDL_DestroyWindow(pWindow);
   TTF_CloseFont(font);
   TTF_Quit();
+  Window_Destroy(wnd);
 
   SDL_Quit();
   return 0;

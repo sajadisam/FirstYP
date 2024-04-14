@@ -11,7 +11,7 @@ else
 	ifeq ($(UNAME_S), Darwin)
 		INCLUDE = /opt/homebrew/include
 		LIBS := -L /opt/homebrew/lib
-		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image 
+		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lm
 	endif
 endif
 
