@@ -22,6 +22,7 @@ typedef struct
   float velocityX;
   float velocityY;
   bool active;
+  SDL_RendererFlip flip;
 } Arrow;
 
 typedef struct
@@ -79,35 +80,55 @@ void initArrows(Arrow *arrows, GameStatus *gameStatus, int amountArrows)
 
 void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int height, int width)
 {
+int frameWidth, frameHeight;
+int column = 0;
+frameWidth = width / 2;
+frameHeight = height;
   
   for (int i = 0; i < MAX_ARROWS; i++)
   {
     if (!arrows[i].active)
     {
-      arrows[i].arrowPosition.x = playerX;
-      arrows[i].arrowPosition.y = playerY;
+      arrows[i].arrowPosition.x = arrows[i].arrowPosition.y = 0;
       arrows[i].arrowPosition.w = arrows[i].arrowPosition.h = 2;
+
+
+      arrows[i].arrowPosition.x = playerX / 1.04;
+      arrows[i].arrowPosition.y = playerY / 1.04;
+      arrows[i].arrowPosition.w = frameWidth / 6; 
+      arrows[i].arrowPosition.h = frameHeight / 6;
 
       arrows[i].arrowRect.x = 0;
       arrows[i].arrowRect.y = 0;
-      arrows[i].arrowRect.w = width/2;
-      arrows[i].arrowRect.h = height;
+      arrows[i].arrowRect.w = frameWidth;
+      arrows[i].arrowRect.h = frameHeight;
+      arrows[i].flip = SDL_FLIP_NONE;
       switch (direction)
       {
       case 0: // Down
+        column = 0;
+        arrows[i].arrowRect.x = column * frameWidth;
+        arrows[i].flip = SDL_FLIP_VERTICAL;
         arrows[i].velocityX = 0;
         arrows[i].velocityY = ARROW_SPEED;
         break;
       case 1: // Left
+        column = 1;
+        arrows[i].arrowRect.x = column * frameWidth;
+        arrows[i].flip = SDL_FLIP_HORIZONTAL;
         arrows[i].velocityX = -ARROW_SPEED;
         arrows[i].velocityY = 0;
+        column = 0;
         break;
       case 2: // Right
-        arrows[i].arrowRect.x += width/2;
+        column = 1;
+        arrows[i].arrowRect.x = column * frameWidth;
         arrows[i].velocityX = ARROW_SPEED;
         arrows[i].velocityY = 0;
         break;
       case 3: // Up
+        column = 0;
+        arrows[i].arrowRect.x = column * frameWidth;
         arrows[i].velocityX = 0;
         arrows[i].velocityY = -ARROW_SPEED;
         break;
@@ -118,18 +139,18 @@ void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int heig
   }
 }
 
-void updateArrows(Arrow *arrows, int deltaTime)
+void updateArrows(Arrow *arrows, float deltaTime)
 {
   for (int i = 0; i < MAX_ARROWS; i++)
   {
     if (arrows[i].active)
     {
-      arrows[i].arrowRect.x += arrows[i].velocityX * deltaTime;
-      arrows[i].arrowRect.y += arrows[i].velocityY * deltaTime;
+      arrows[i].arrowPosition.x += arrows[i].velocityX * deltaTime * 2;
+      arrows[i].arrowPosition.y += arrows[i].velocityY * deltaTime * 2;
 
       // Check if the arrow is off-screen, then deactivate
-      if (arrows[i].arrowRect.x < 0 || arrows[i].arrowRect.x > WINDOW_WIDTH ||
-          arrows[i].arrowRect.y < 0 || arrows[i].arrowRect.y > WINDOW_HEIGHT)
+      if (arrows[i].arrowPosition.x < 0 || arrows[i].arrowPosition.x > WINDOW_WIDTH ||
+          arrows[i].arrowPosition.y < 0 || arrows[i].arrowPosition.y > WINDOW_HEIGHT)
       {
         arrows[i].active = false;
       }
@@ -343,7 +364,6 @@ int main(int argv, char **args)
 
   while (!closeWindow)
   {
-    printf("min baba\n");
     while (SDL_PollEvent(&event))
     {
       switch (event.type)
@@ -529,7 +549,7 @@ int main(int argv, char **args)
       if (arrows[i].active)
       {
         printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
-        SDL_RenderCopy(pRenderer, arrowTexture, &arrows[i].arrowRect, &arrows[i].arrowPosition);
+        SDL_RenderCopyEx(pRenderer, arrowTexture, &arrows[i].arrowRect, &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
       }
     }
     if (newImageVisible)
