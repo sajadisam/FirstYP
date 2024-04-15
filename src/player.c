@@ -1,7 +1,5 @@
 #include "player.h"
-
-#define WINDOW_WIDTH 600
-#define WINDOW_HEIGHT 400
+#include "config.h"
 
 SDL_Rect GetPlayerBoundingBox(Player *player) {
   return (SDL_Rect){

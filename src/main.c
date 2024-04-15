@@ -1,3 +1,4 @@
+#include "config.h"
 #include "player.h"
 #include "window.h"
 #include <SDL2/SDL.h>
@@ -362,7 +363,6 @@ int main(int argv, char **args) {
       dirY = deltaY / distance;
       mobPosition.x += dirX * mobSPEED;
       mobPosition.y += dirY * mobSPEED;
-
       if (fabs(dirX) > fabs(dirY)) {
         mobCurrentRow = (dirX > 0) ? 2 : 1; // Right or Left
       } else {
