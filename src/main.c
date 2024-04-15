@@ -1,3 +1,4 @@
+#include "player.h"
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -12,7 +13,6 @@
 #define WINDOW_HEIGHT 720
 #define FRAME_DELAY_MS 100
 #define FPS 60
-#define MAX_ARROWS 10
 #define ARROW_SPEED 200
 
 typedef struct {
@@ -176,8 +176,6 @@ int main(int argv, char **args) {
   if (!wnd)
     return 2;
 
-  SDL_Window *pWindow = wnd->m_Window;
-  SDL_Renderer *pRenderer = wnd->m_Renderer;
   SDL_Texture *pTexture = Window_Texture("./resources/player.png", wnd);
   SDL_Texture *newTexture = Window_Texture("./resources/redGem.png", wnd);
   SDL_Texture *mapTexture = Window_Texture("./resources/Map.png", wnd);
@@ -299,8 +297,6 @@ int main(int argv, char **args) {
   float playerVelocityY = 0;
 
   bool closeWindow = false;
-  bool up, down, left, right;
-  up = down = left = right = false;
   int currentRow = 0;
   SDL_Event event;
   TTF_Font *font = TTF_OpenFont("./resources/Sans.ttf", 24);
@@ -309,6 +305,8 @@ int main(int argv, char **args) {
     // hanterar error
   }
   bool isFullscreen = false;
+  Player player;
+  player.movement_flags = (PlayerMovementFlags){};
 
   while (!closeWindow) {
     while (SDL_PollEvent(&event)) {
@@ -325,25 +323,25 @@ int main(int argv, char **args) {
           break;
         case SDL_SCANCODE_W:
         case SDL_SCANCODE_UP:
-          up = true;
+          player.movement_flags.up = true;
           currentRow = 3; // Set to the second row for the left movement
           playerRect.y = currentRow * frameHeight;
           break;
         case SDL_SCANCODE_A:
         case SDL_SCANCODE_LEFT:
-          left = true;
+          player.movement_flags.left = true;
           currentRow = 1; // Set to the second row for the left movement
           playerRect.y = currentRow * frameHeight;
           break;
         case SDL_SCANCODE_S:
         case SDL_SCANCODE_DOWN:
-          down = true;
+          player.movement_flags.down = true;
           currentRow = 0; // Set to the second row for the left movement
           playerRect.y = currentRow * frameHeight;
           break;
         case SDL_SCANCODE_D:
         case SDL_SCANCODE_RIGHT:
-          right = true;
+          player.movement_flags.right = true;
           currentRow = 2; // Set to the second row for the left movement
           playerRect.y = currentRow * frameHeight;
           break;
@@ -353,20 +351,20 @@ int main(int argv, char **args) {
         switch (event.key.keysym.scancode) {
         case SDL_SCANCODE_W:
         case SDL_SCANCODE_UP:
-          up = false;
+          player.movement_flags.up = false;
           break;
         case SDL_SCANCODE_A:
         case SDL_SCANCODE_LEFT:
-          left = false;
+          player.movement_flags.left = false;
           break;
         case SDL_SCANCODE_S:
         case SDL_SCANCODE_DOWN:
-          down = false;
+          player.movement_flags.down = false;
           break;
 
         case SDL_SCANCODE_D:
         case SDL_SCANCODE_RIGHT:
-          right = false;
+          player.movement_flags.right = false;
           break;
         }
         break;
@@ -404,14 +402,14 @@ int main(int argv, char **args) {
     SDL_RenderPresent(pRenderer);
 
     playerVelocityX = playerVelocityY = 0;
-    if (up && !down)
+    if (player.movement_flags.up && !player.movement_flags.down)
       playerVelocityY = -SPEED;
-    if (down && !up)
-      playerVelocityY = SPEED + 20;
-    if (left && !right)
+    if (player.movement_flags.down && !player.movement_flags.up)
+      playerVelocityY = SPEED;
+    if (player.movement_flags.left && !player.movement_flags.right)
       playerVelocityX = -SPEED;
-    if (right && !left)
-      playerVelocityX = SPEED + 20;
+    if (player.movement_flags.right && !player.movement_flags.left)
+      playerVelocityX = SPEED;
     playerPosition.x += playerVelocityX / 60;
     playerPosition.y += playerVelocityY / 60;
 
@@ -430,13 +428,6 @@ int main(int argv, char **args) {
     float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
 
     int mobCurrentRow = 0;
-    updateArrows(arrows, deltaTime);
-    arrowShootTimer -= deltaTime;
-    if (arrowShootTimer <= 0) {
-      shootArrow(playerPosition.x, playerPosition.y, currentRow, arrows,
-                 arrowHeight, arrowWidth);  // Shoot an arrow
-      arrowShootTimer = arrowShootInterval; // Reset the timer
-    }
 
     if (distance > 1) {
       float dirX = deltaX / distance;
@@ -469,25 +460,20 @@ int main(int argv, char **args) {
     playerPosition.x = newPlayerX;
     playerPosition.y = newPlayerY;
 
-    SDL_RenderClear(pRenderer);
-    SDL_RenderCopy(pRenderer, mapTexture, NULL, &mapRect);
-    SDL_RenderCopy(pRenderer, mobTexture, &mobRect, &mobPosition);
-    SDL_RenderCopy(pRenderer, pTexture, &playerRect, &playerPosition);
-    for (int i = 0; i < MAX_ARROWS; i++) {
-      if (arrows[i].active) {
-        printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
-               arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
-        SDL_RenderCopyEx(pRenderer, arrowTexture, &arrows[i].arrowRect,
-                         &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
-      }
-    }
+    SDL_RenderClear(wnd->m_Renderer);
+    SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
+    SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
+    SDL_RenderCopy(wnd->m_Renderer, pTexture, &playerRect, &playerPosition);
+
     if (newImageVisible) {
-      SDL_RenderCopy(pRenderer, newTexture, NULL, &newImagePosition);
+      SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
     }
     if (CheckCollision(playerPosition, newImagePosition) && newImageVisible) {
       newImageVisible = false;
       SPEED *= 3;
     }
+    SDL_RenderPresent(wnd->m_Renderer);
+    SDL_Delay(16);
   }
 
   SDL_DestroyTexture(pTexture);
