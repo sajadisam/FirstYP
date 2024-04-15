@@ -2,13 +2,14 @@
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_image.h>
 
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 1024
+#define WINDOW_HEIGHT 720
 #define FRAME_DELAY_MS 100
 #define FPS 60
 #define MAX_ARROWS 10
@@ -132,7 +133,6 @@ int main(int argv, char **args)
   int SPEED = 100;
   int mobSPEED = 1;
   float arrowLossTimer = 0;
-  printf("Attempting to shoot an arrow...\n");
   Arrow arrows[MAX_ARROWS];
   float arrowShootTimer = 0;
   float arrowShootInterval = 2.0;
@@ -330,6 +330,7 @@ int main(int argv, char **args)
     printf("Failed to load : %s\n", TTF_GetError());
     // hanterar error
   }
+  bool isFullscreen = false;
 
   while (!closeWindow)
   {
@@ -344,6 +345,10 @@ int main(int argv, char **args)
       case SDL_KEYDOWN:
         switch (event.key.keysym.scancode)
         {
+        case SDL_SCANCODE_F11:  // Använd F11 för att växla fullskärm
+                isFullscreen = !isFullscreen;  // Toggle the fullscreen state
+                SDL_SetWindowFullscreen(pWindow, isFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
+         break;
         case SDL_SCANCODE_W:
         case SDL_SCANCODE_UP:
           up = true;
