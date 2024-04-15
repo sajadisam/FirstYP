@@ -148,7 +148,6 @@ void updateArrows(Arrow *arrows, float deltaTime) {
 }
 
 int main(int argv, char **args) {
-  int SPEED = 100;
   int mobSPEED = 1;
   float arrowLossTimer = 0;
   Arrow arrows[MAX_ARROWS];
@@ -261,26 +260,17 @@ int main(int argv, char **args) {
   int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
   int newY = rand() % WINDOW_HEIGHT;
-  SDL_Rect playerRect;
-  SDL_Rect playerPosition;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
   SDL_Rect mobRect;
   SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50,
                           50};
 
-  playerPosition.x = playerPosition.y = 0;
-  playerPosition.w = playerPosition.h = 12;
-
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(mobTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(arrowTexture, NULL, NULL, &arrowWidth, &arrowHeight);
   frameWidth = textureWidth / 3;
   frameHeight = textureHeight / 4;
-
-  playerRect.x = playerRect.y = 0;
-  playerRect.w = frameWidth;
-  playerRect.h = frameHeight;
 
   mobRect.x = mobRect.y = 0;
   mobRect.w = frameWidth;
@@ -289,15 +279,7 @@ int main(int argv, char **args) {
   int frame = 0;
   bool running = true;
 
-  playerPosition.x = (WINDOW_WIDTH - frameWidth) / 2;   // left side
-  playerPosition.y = (WINDOW_HEIGHT - frameHeight) / 2; // upper side
-  playerPosition.w = frameWidth;
-  playerPosition.h = frameHeight;
-  float playerVelocityX = 0;
-  float playerVelocityY = 0;
-
   bool closeWindow = false;
-  int currentRow = 0;
   SDL_Event event;
   TTF_Font *font = TTF_OpenFont("./resources/Sans.ttf", 24);
   if (!font) {
@@ -307,76 +289,33 @@ int main(int argv, char **args) {
   bool isFullscreen = false;
   Player player;
   player.movement_flags = (PlayerMovementFlags){};
+  player.coordinate = (SDL_Point){
+      (WINDOW_WIDTH - frameWidth) / 2,
+      (WINDOW_HEIGHT - frameHeight) / 2,
+  };
+  player.frame_size = (Vec2){
+      frameWidth,
+      frameHeight,
+  };
+  player.speed = 5;
 
   while (!closeWindow) {
+    SDL_Rect nextPlayerFrame;
+
     while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
+      if (event.type == SDL_QUIT) {
         closeWindow = true;
         break;
-      case SDL_KEYDOWN:
-        switch (event.key.keysym.scancode) {
-        case SDL_SCANCODE_F11: // Använd F11 för att växla fullskärm
-          isFullscreen = !isFullscreen; // Toggle the fullscreen state
-          SDL_SetWindowFullscreen(pWindow,
-                                  isFullscreen ? SDL_WINDOW_FULLSCREEN : 0);
-          break;
-        case SDL_SCANCODE_W:
-        case SDL_SCANCODE_UP:
-          player.movement_flags.up = true;
-          currentRow = 3; // Set to the second row for the left movement
-          playerRect.y = currentRow * frameHeight;
-          break;
-        case SDL_SCANCODE_A:
-        case SDL_SCANCODE_LEFT:
-          player.movement_flags.left = true;
-          currentRow = 1; // Set to the second row for the left movement
-          playerRect.y = currentRow * frameHeight;
-          break;
-        case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN:
-          player.movement_flags.down = true;
-          currentRow = 0; // Set to the second row for the left movement
-          playerRect.y = currentRow * frameHeight;
-          break;
-        case SDL_SCANCODE_D:
-        case SDL_SCANCODE_RIGHT:
-          player.movement_flags.right = true;
-          currentRow = 2; // Set to the second row for the left movement
-          playerRect.y = currentRow * frameHeight;
-          break;
-        }
-        break;
-      case SDL_KEYUP:
-        switch (event.key.keysym.scancode) {
-        case SDL_SCANCODE_W:
-        case SDL_SCANCODE_UP:
-          player.movement_flags.up = false;
-          break;
-        case SDL_SCANCODE_A:
-        case SDL_SCANCODE_LEFT:
-          player.movement_flags.left = false;
-          break;
-        case SDL_SCANCODE_S:
-        case SDL_SCANCODE_DOWN:
-          player.movement_flags.down = false;
-          break;
-
-        case SDL_SCANCODE_D:
-        case SDL_SCANCODE_RIGHT:
-          player.movement_flags.right = false;
-          break;
-        }
-        break;
       }
+      PlayerEvents(&event, &player, &nextPlayerFrame);
     }
 
     frameTime++;
     if (frameTime == 5) {
       frameTime = 0;
-      playerRect.x += frameWidth;
-      if (playerRect.x >= textureWidth)
-        playerRect.x = 0;
+      nextPlayerFrame.x += frameWidth;
+      if (nextPlayerFrame.x >= textureWidth)
+        nextPlayerFrame.x = 0;
     }
 
     mobFrameTime++;
@@ -401,23 +340,10 @@ int main(int argv, char **args) {
     drawUI(pRenderer, font, &gameStatus);
     SDL_RenderPresent(pRenderer);
 
-    playerVelocityX = playerVelocityY = 0;
-    if (player.movement_flags.up && !player.movement_flags.down)
-      playerVelocityY = -SPEED;
-    if (player.movement_flags.down && !player.movement_flags.up)
-      playerVelocityY = SPEED;
-    if (player.movement_flags.left && !player.movement_flags.right)
-      playerVelocityX = -SPEED;
-    if (player.movement_flags.right && !player.movement_flags.left)
-      playerVelocityX = SPEED;
-    playerPosition.x += playerVelocityX / 60;
-    playerPosition.y += playerVelocityY / 60;
+    PlayerEventLoop(&player);
 
-    float newPlayerX = playerPosition.x + playerVelocityX / FPS;
-    float newPlayerY = playerPosition.y + playerVelocityY / FPS;
-
-    int deltaX = playerPosition.x - mobPosition.x;
-    int deltaY = playerPosition.y - mobPosition.y;
+    int deltaX = player.coordinate.x - mobPosition.x;
+    int deltaY = player.coordinate.y - mobPosition.y;
     if (deltaX != 0) {
       mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
     }
@@ -445,44 +371,37 @@ int main(int argv, char **args) {
       mobRect.y = mobCurrentRow * frameHeight;
     }
 
-    if (newPlayerX < 0) {
-      newPlayerX = 0;
-    } else if (newPlayerX + playerPosition.w > WINDOW_WIDTH) {
-      newPlayerX = WINDOW_WIDTH - playerPosition.w;
-    }
-
-    if (newPlayerY < 0) {
-      newPlayerY = 0;
-    } else if (newPlayerY + playerPosition.h > WINDOW_HEIGHT) {
-      newPlayerY = WINDOW_HEIGHT - playerPosition.h;
-    }
-
-    playerPosition.x = newPlayerX;
-    playerPosition.y = newPlayerY;
-
     SDL_RenderClear(wnd->m_Renderer);
     SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
     SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
-    SDL_RenderCopy(wnd->m_Renderer, pTexture, &playerRect, &playerPosition);
+    SDL_RenderCopy(wnd->m_Renderer, pTexture,
+                   &(SDL_Rect){
+                       nextPlayerFrame.x,
+                       nextPlayerFrame.y,
+                       player.frame_size.w,
+                       player.frame_size.h,
+                   },
+                   (SDL_Rect *)&player.coordinate);
 
     if (newImageVisible) {
       SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
     }
-    if (CheckCollision(playerPosition, newImagePosition) && newImageVisible) {
+
+    if (CheckCollision(GetPlayerBoundingBox(&player), newImagePosition) &&
+        newImageVisible) {
       newImageVisible = false;
-      SPEED *= 3;
+      player.speed *= 2;
     }
+
     SDL_RenderPresent(wnd->m_Renderer);
     SDL_Delay(16);
   }
-
   SDL_DestroyTexture(pTexture);
   SDL_DestroyRenderer(pRenderer);
   SDL_DestroyWindow(pWindow);
   TTF_CloseFont(font);
   TTF_Quit();
   Window_Destroy(wnd);
-
   SDL_Quit();
   return 0;
 }
