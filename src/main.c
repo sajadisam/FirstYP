@@ -17,7 +17,8 @@
 
 typedef struct
 {
-  SDL_Rect position;
+  SDL_Rect arrowRect;
+  SDL_Rect arrowPosition;
   float velocityX;
   float velocityY;
   bool active;
@@ -76,15 +77,21 @@ void initArrows(Arrow *arrows, GameStatus *gameStatus, int amountArrows)
   gameStatus->arrowsRemaining = amountArrows;
 }
 
-void shootArrow(int playerX, int playerY, int direction, Arrow *arrows)
+void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int height, int width)
 {
+  
   for (int i = 0; i < MAX_ARROWS; i++)
   {
     if (!arrows[i].active)
     {
-      arrows[i].position.x = playerX;
-      arrows[i].position.y = playerY;
-      arrows[i].active = true;
+      arrows[i].arrowPosition.x = playerX;
+      arrows[i].arrowPosition.y = playerY;
+      arrows[i].arrowPosition.w = arrows[i].arrowPosition.h = 2;
+
+      arrows[i].arrowRect.x = 0;
+      arrows[i].arrowRect.y = 0;
+      arrows[i].arrowRect.w = width/2;
+      arrows[i].arrowRect.h = height;
       switch (direction)
       {
       case 0: // Down
@@ -96,6 +103,7 @@ void shootArrow(int playerX, int playerY, int direction, Arrow *arrows)
         arrows[i].velocityY = 0;
         break;
       case 2: // Right
+        arrows[i].arrowRect.x += width/2;
         arrows[i].velocityX = ARROW_SPEED;
         arrows[i].velocityY = 0;
         break;
@@ -104,6 +112,7 @@ void shootArrow(int playerX, int playerY, int direction, Arrow *arrows)
         arrows[i].velocityY = -ARROW_SPEED;
         break;
       }
+      arrows[i].active = true;
       break; // Exit after activating an arrow
     }
   }
@@ -115,12 +124,12 @@ void updateArrows(Arrow *arrows, int deltaTime)
   {
     if (arrows[i].active)
     {
-      arrows[i].position.x += arrows[i].velocityX * deltaTime;
-      arrows[i].position.y += arrows[i].velocityY * deltaTime;
+      arrows[i].arrowRect.x += arrows[i].velocityX * deltaTime;
+      arrows[i].arrowRect.y += arrows[i].velocityY * deltaTime;
 
       // Check if the arrow is off-screen, then deactivate
-      if (arrows[i].position.x < 0 || arrows[i].position.x > WINDOW_WIDTH ||
-          arrows[i].position.y < 0 || arrows[i].position.y > WINDOW_HEIGHT)
+      if (arrows[i].arrowRect.x < 0 || arrows[i].arrowRect.x > WINDOW_WIDTH ||
+          arrows[i].arrowRect.y < 0 || arrows[i].arrowRect.y > WINDOW_HEIGHT)
       {
         arrows[i].active = false;
       }
@@ -280,7 +289,7 @@ int main(int argv, char **args)
   Uint32 startTick = SDL_GetTicks(), endTick;
   float deltaTime;
 
-  int textureWidth, textureHeight, frameWidth, frameHeight;
+  int textureWidth, textureHeight, frameWidth, frameHeight, arrowWidth, arrowHeight;
   int frameTime = 0;
   int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
@@ -297,7 +306,7 @@ int main(int argv, char **args)
 
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(mobTexture, NULL, NULL, &textureWidth, &textureHeight);
-
+  SDL_QueryTexture(arrowTexture, NULL, NULL, &arrowWidth, &arrowHeight);
   frameWidth = textureWidth / 3;
   frameHeight = textureHeight / 4;
 
@@ -437,11 +446,11 @@ int main(int argv, char **args)
     if (up && !down)
       playerVelocityY = -SPEED;
     if (down && !up)
-      playerVelocityY = SPEED;
+      playerVelocityY = SPEED + 20;
     if (left && !right)
       playerVelocityX = -SPEED;
     if (right && !left)
-      playerVelocityX = SPEED;
+      playerVelocityX = SPEED + 20;
     playerPosition.x += playerVelocityX / 60;
     playerPosition.y += playerVelocityY / 60;
 
@@ -466,7 +475,7 @@ int main(int argv, char **args)
     arrowShootTimer -= deltaTime;
     if (arrowShootTimer <= 0)
     {
-      shootArrow(playerPosition.x, playerPosition.y, currentRow, arrows); // Shoot an arrow
+      shootArrow(playerPosition.x, playerPosition.y, currentRow, arrows, arrowHeight, arrowWidth); // Shoot an arrow
       arrowShootTimer = arrowShootInterval;                               // Reset the timer
     }
 
@@ -519,8 +528,8 @@ int main(int argv, char **args)
     {
       if (arrows[i].active)
       {
-        printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].position.x, arrows[i].position.y);
-        SDL_RenderCopy(pRenderer, arrowTexture, NULL, &arrows[i].position);
+        printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active, arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
+        SDL_RenderCopy(pRenderer, arrowTexture, &arrows[i].arrowRect, &arrows[i].arrowPosition);
       }
     }
     if (newImageVisible)
