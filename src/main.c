@@ -10,11 +10,17 @@
 #include <stdlib.h>
 #include <time.h>
 
-#define WINDOW_WIDTH 1280
-#define WINDOW_HEIGHT 720
-#define FRAME_DELAY_MS 100
 #define FPS 60
 #define ARROW_SPEED 200
+#define MAX_ARROWS 10
+#define ARROW_SPEED 200
+
+typedef struct {
+  SDL_Rect position;
+  float velocityX;
+  float velocityY;
+  bool active;
+} Arrow;
 
 typedef struct {
   SDL_Rect arrowRect;
@@ -356,6 +362,14 @@ int main(int argv, char **args) {
 
     int mobCurrentRow = 0;
 
+    updateArrows(arrows, deltaTime);
+    arrowShootTimer -= deltaTime;
+    if (arrowShootTimer <= 0) {
+      shootArrow(player.coordinate.x, player.coordinate.y, 1,
+                 arrows);                   // Shoot an arrow
+      arrowShootTimer = arrowShootInterval; // Reset the timer
+    }
+
     if (distance > 1) {
       float dirX = deltaX / distance;
       float dirY = deltaY / distance;
@@ -382,6 +396,15 @@ int main(int argv, char **args) {
                        player.frame_size.h,
                    },
                    (SDL_Rect *)&player.coordinate);
+
+    for (int i = 0; i < MAX_ARROWS; i++) {
+      if (arrows[i].active) {
+        printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
+               arrows[i].position.x, arrows[i].position.y);
+        SDL_RenderCopy(wnd->m_Renderer, arrowTexture, NULL,
+                       &arrows[i].position);
+      }
+    }
 
     if (newImageVisible) {
       SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
