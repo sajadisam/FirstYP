@@ -6,7 +6,7 @@ else
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S), Linux)
 		INCLUDE = /usr/include/SDL2
-		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image 
+		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lm
 	endif
 	ifeq ($(UNAME_S), Darwin)
 		INCLUDE = /opt/homebrew/include
