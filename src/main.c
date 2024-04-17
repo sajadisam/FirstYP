@@ -16,13 +16,6 @@
 #define ARROW_SPEED 200
 
 typedef struct {
-  SDL_Rect position;
-  float velocityX;
-  float velocityY;
-  bool active;
-} Arrow;
-
-typedef struct {
   SDL_Rect arrowRect;
   SDL_Rect arrowPosition;
   float velocityX;
@@ -169,12 +162,6 @@ int main(int argv, char **args) {
     return 1;
   }
 
-  SDL_Window *pWindow =
-      SDL_CreateWindow("Enkelt exempel 1", SDL_WINDOWPOS_CENTERED,
-                       SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, 0);
-  if (!pWindow) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_Quit();
   if (Window_IntitializeSDL())
     return 1;
 
@@ -188,75 +175,6 @@ int main(int argv, char **args) {
   SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
   SDL_Texture *arrowTexture = Window_Texture("./resources/arrow.png", wnd);
 
-  SDL_Texture *newTexture = SDL_CreateTextureFromSurface(pRenderer, newSurface);
-  SDL_FreeSurface(newSurface);
-  if (!newTexture) {
-    printf("Unable to create texture from %s! SDL Error: %s\n",
-           "resources/ship.png", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-
-  SDL_Surface *mapSurface = IMG_Load("./resources/Map.png");
-  if (!mapSurface) {
-    printf("Unable to load image %s! SDL_image Error: %s\n",
-           "resources/map.png", IMG_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-
-  SDL_Texture *mapTexture = SDL_CreateTextureFromSurface(pRenderer, mapSurface);
-  SDL_FreeSurface(mapSurface);
-  if (!mapTexture) {
-    printf("Unable to create texture from %s! SDL Error: %s\n",
-           "resources/ship.png", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-
-  SDL_Surface *mobSurface = IMG_Load("./resources/mob.png");
-  if (!mobSurface) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-  SDL_Texture *mobTexture = SDL_CreateTextureFromSurface(pRenderer, mobSurface);
-  SDL_FreeSurface(mobSurface);
-  if (!mobTexture) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-
-  SDL_Surface *arrowSurface = IMG_Load("./resources/arrow.png");
-  if (!mobSurface) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
-
-  SDL_Texture *arrowTexture =
-      SDL_CreateTextureFromSurface(pRenderer, arrowSurface);
-  SDL_FreeSurface(arrowSurface);
-  if (!mobTexture) {
-    printf("Error: %s\n", SDL_GetError());
-    SDL_DestroyRenderer(pRenderer);
-    SDL_DestroyWindow(pWindow);
-    SDL_Quit();
-    return 1;
-  }
   initArrows(arrows, &gameStatus, 30);
   Uint32 startTick = SDL_GetTicks(), endTick;
   float deltaTime;
@@ -291,8 +209,8 @@ int main(int argv, char **args) {
   TTF_Font *font = TTF_OpenFont("./resources/Sans.ttf", 24);
   if (!font) {
     printf("Failed to load : %s\n", TTF_GetError());
-    // hanterar error
   }
+
   bool isFullscreen = false;
   Player player;
   player.movement_flags = (PlayerMovementFlags){};
@@ -300,6 +218,7 @@ int main(int argv, char **args) {
       (WINDOW_WIDTH - frameWidth) / 2,
       (WINDOW_HEIGHT - frameHeight) / 2,
   };
+
   player.frame_size = (Vec2){
       frameWidth,
       frameHeight,
@@ -308,7 +227,6 @@ int main(int argv, char **args) {
 
   while (!closeWindow) {
     SDL_Rect nextPlayerFrame;
-
     while (SDL_PollEvent(&event)) {
       if (event.type == SDL_QUIT) {
         closeWindow = true;
@@ -344,8 +262,9 @@ int main(int argv, char **args) {
       }
       arrowLossTimer = 0;
     }
-    drawUI(pRenderer, font, &gameStatus);
-    SDL_RenderPresent(pRenderer);
+
+    drawUI(wnd->m_Renderer, font, &gameStatus);
+    SDL_RenderPresent(wnd->m_Renderer);
 
     PlayerEventLoop(&player);
 
@@ -365,8 +284,9 @@ int main(int argv, char **args) {
     updateArrows(arrows, deltaTime);
     arrowShootTimer -= deltaTime;
     if (arrowShootTimer <= 0) {
-      shootArrow(player.coordinate.x, player.coordinate.y, 1,
-                 arrows);                   // Shoot an arrow
+      shootArrow(player.coordinate.x, player.coordinate.y,
+                 nextPlayerFrame.y / player.frame_size.h, arrows, arrowHeight,
+                 arrowWidth);               // Shoot an arrow
       arrowShootTimer = arrowShootInterval; // Reset the timer
     }
 
@@ -400,9 +320,9 @@ int main(int argv, char **args) {
     for (int i = 0; i < MAX_ARROWS; i++) {
       if (arrows[i].active) {
         printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
-               arrows[i].position.x, arrows[i].position.y);
-        SDL_RenderCopy(wnd->m_Renderer, arrowTexture, NULL,
-                       &arrows[i].position);
+               arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
+        SDL_RenderCopyEx(wnd->m_Renderer, arrowTexture, &arrows[i].arrowRect,
+                         &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
       }
     }
 
@@ -415,13 +335,8 @@ int main(int argv, char **args) {
       newImageVisible = false;
       player.speed *= 2;
     }
-
-    SDL_RenderPresent(wnd->m_Renderer);
-    SDL_Delay(16);
   }
-  SDL_DestroyTexture(pTexture);
-  SDL_DestroyRenderer(pRenderer);
-  SDL_DestroyWindow(pWindow);
+
   TTF_CloseFont(font);
   TTF_Quit();
   Window_Destroy(wnd);
