@@ -1,6 +1,7 @@
 #include "config.h"
 #include "menu.h"
 #include "player.h"
+#include "mobs.h"
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -74,8 +75,7 @@ void initArrows(Arrow *arrows, GameStatus *gameStatus, int amountArrows) {
   gameStatus->arrowsRemaining = amountArrows;
 }
 
-void shootArrow(int playerX, int playerY, int direction, Arrow *arrows,
-                int height, int width) {
+void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int height, int width) {
   int frameWidth, frameHeight;
   int column = 0;
   frameWidth = width / 2;
@@ -149,14 +149,16 @@ void updateArrows(Arrow *arrows, float deltaTime) {
 }
 
 int main(int argv, char **args) {
-  int mobSPEED = 1;
   float arrowLossTimer = 0;
   Arrow arrows[MAX_ARROWS];
   float arrowShootTimer = 0;
   float arrowShootInterval = 2.0;
   srand(time(NULL));
   bool newImageVisible = true;
-
+///////////
+  Mob mob;  // Declare your mob variable
+  InitMob(&mob, rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50, 50, 100, 1);  // Initialize the mob
+//////////
   if (TTF_Init() != 0) {
     printf("Error initializing SDL_ttf: %s\n", TTF_GetError());
     SDL_Quit();
@@ -173,8 +175,8 @@ int main(int argv, char **args) {
   SDL_Texture *pTexture = Window_Texture("./resources/player.png", wnd);
   SDL_Texture *newTexture = Window_Texture("./resources/redGem.png", wnd);
   SDL_Texture *mapTexture = Window_Texture("./resources/Map.png", wnd);
-  SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
   SDL_Texture *arrowTexture = Window_Texture("./resources/arrow.png", wnd);
+  SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
 
   initArrows(arrows, &gameStatus, 30);
   Uint32 startTick = SDL_GetTicks(), endTick;
@@ -183,24 +185,15 @@ int main(int argv, char **args) {
   int textureWidth, textureHeight, frameWidth, frameHeight, arrowWidth,
       arrowHeight;
   int frameTime = 0;
-  int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
   int newY = rand() % WINDOW_HEIGHT;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-  SDL_Rect mobRect;
-  SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50,
-                          50};
 
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
-  SDL_QueryTexture(mobTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(arrowTexture, NULL, NULL, &arrowWidth, &arrowHeight);
   frameWidth = textureWidth / 3;
   frameHeight = textureHeight / 4;
-
-  mobRect.x = mobRect.y = 0;
-  mobRect.w = frameWidth;
-  mobRect.h = frameHeight;
 
   int frame = 0;
   bool running = true;
