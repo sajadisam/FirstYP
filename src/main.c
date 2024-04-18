@@ -1,5 +1,6 @@
 #include "config.h"
 #include "player.h"
+#include "mobs.h"
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -73,8 +74,7 @@ void initArrows(Arrow *arrows, GameStatus *gameStatus, int amountArrows) {
   gameStatus->arrowsRemaining = amountArrows;
 }
 
-void shootArrow(int playerX, int playerY, int direction, Arrow *arrows,
-                int height, int width) {
+void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int height, int width) {
   int frameWidth, frameHeight;
   int column = 0;
   frameWidth = width / 2;
@@ -148,14 +148,16 @@ void updateArrows(Arrow *arrows, float deltaTime) {
 }
 
 int main(int argv, char **args) {
-  int mobSPEED = 1;
   float arrowLossTimer = 0;
   Arrow arrows[MAX_ARROWS];
   float arrowShootTimer = 0;
   float arrowShootInterval = 2.0;
   srand(time(NULL));
   bool newImageVisible = true;
-
+///////////
+  Mob mob;  // Declare your mob variable
+  InitMob(&mob, rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50, 50, 100, 1);  // Initialize the mob
+//////////
   if (TTF_Init() != 0) {
     printf("Error initializing SDL_ttf: %s\n", TTF_GetError());
     SDL_Quit();
@@ -172,8 +174,8 @@ int main(int argv, char **args) {
   SDL_Texture *pTexture = Window_Texture("./resources/player.png", wnd);
   SDL_Texture *newTexture = Window_Texture("./resources/redGem.png", wnd);
   SDL_Texture *mapTexture = Window_Texture("./resources/Map.png", wnd);
-  SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
   SDL_Texture *arrowTexture = Window_Texture("./resources/arrow.png", wnd);
+  SDL_Texture *mobTexture = Window_Texture("./resources/mob.png", wnd);
 
   initArrows(arrows, &gameStatus, 30);
   Uint32 startTick = SDL_GetTicks(), endTick;
@@ -182,24 +184,15 @@ int main(int argv, char **args) {
   int textureWidth, textureHeight, frameWidth, frameHeight, arrowWidth,
       arrowHeight;
   int frameTime = 0;
-  int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
   int newY = rand() % WINDOW_HEIGHT;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
-  SDL_Rect mobRect;
-  SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50,
-                          50};
 
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
-  SDL_QueryTexture(mobTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(arrowTexture, NULL, NULL, &arrowWidth, &arrowHeight);
   frameWidth = textureWidth / 3;
   frameHeight = textureHeight / 4;
-
-  mobRect.x = mobRect.y = 0;
-  mobRect.w = frameWidth;
-  mobRect.h = frameHeight;
 
   int frame = 0;
   bool running = true;
@@ -242,13 +235,18 @@ int main(int argv, char **args) {
       if (nextPlayerFrame.x >= textureWidth)
         nextPlayerFrame.x = 0;
     }
+/////////
+    UpdateMob(&mob, player.coordinate);  // Update the mob's position based on the player's position
+    RenderMob(wnd->m_Renderer, mobTexture, &mob);  // Render the mob
 
-    mobFrameTime++;
-    if (mobFrameTime >= (FPS / 2)) {
-      mobFrameTime = 0;
-      frame = (frame + 1) % 3;
-      mobRect.x = frame * frameWidth;
+    if (CheckMobCollision(&mob, GetPlayerBoundingBox(&player))) {
+      gameStatus.health -= 10;  
+      if (gameStatus.health <= 0) {
+        gameStatus.health = 100;
+      }
     }
+/////////
+
     endTick = SDL_GetTicks();
     deltaTime =
         (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
@@ -268,19 +266,6 @@ int main(int argv, char **args) {
 
     PlayerEventLoop(&player);
 
-    int deltaX = player.coordinate.x - mobPosition.x;
-    int deltaY = player.coordinate.y - mobPosition.y;
-    if (deltaX != 0) {
-      mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
-    }
-
-    if (deltaY != 0) {
-      mobPosition.y += (deltaY > 0 ? mobSPEED : -mobSPEED);
-    }
-    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    int mobCurrentRow = 0;
-
     updateArrows(arrows, deltaTime);
     arrowShootTimer -= deltaTime;
     if (arrowShootTimer <= 0) {
@@ -290,24 +275,8 @@ int main(int argv, char **args) {
       arrowShootTimer = arrowShootInterval; // Reset the timer
     }
 
-    if (distance > 1) {
-      float dirX = deltaX / distance;
-      float dirY = deltaY / distance;
-      dirX = deltaX / distance;
-      dirY = deltaY / distance;
-      mobPosition.x += dirX * mobSPEED;
-      mobPosition.y += dirY * mobSPEED;
-      if (fabs(dirX) > fabs(dirY)) {
-        mobCurrentRow = (dirX > 0) ? 2 : 1; // Right or Left
-      } else {
-        mobCurrentRow = (dirY > 0) ? 0 : 3; // Down or Up
-      }
-      mobRect.y = mobCurrentRow * frameHeight;
-    }
-
     SDL_RenderClear(wnd->m_Renderer);
     SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
-    SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
     SDL_RenderCopy(wnd->m_Renderer, pTexture,
                    &(SDL_Rect){
                        nextPlayerFrame.x,

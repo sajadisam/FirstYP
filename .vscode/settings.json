@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "sdl_image.h": "c",
+        "config.h": "c"
     }
 }
