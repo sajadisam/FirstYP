@@ -281,6 +281,15 @@ int main(int argv, char **args) {
 
     int mobCurrentRow = 0;
 
+    if (CheckCollision((SDL_Rect){player.coordinate.x, player.coordinate.y, player.frame_size.w, player.frame_size.h}, mobPosition)) {
+      gameStatus.health -= 10; // Reduce health by 10 or any other suitable value
+      if (gameStatus.health <= 0) {
+        // Handle game over scenario, such as stopping the game or restarting
+        gameStatus.health = 100;  // Example: stop the game loop
+      }
+    }
+
+
     updateArrows(arrows, deltaTime);
     arrowShootTimer -= deltaTime;
     if (arrowShootTimer <= 0) {
