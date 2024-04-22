@@ -4,5 +4,6 @@
         "stdlib.h": "c",
         "sdl.h": "c"
         "sdl_image.h": "c",
-        "config.h": "c"
+        "config.h": "c",
+        "time.h": "c"
     }

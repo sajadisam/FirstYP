@@ -15,7 +15,7 @@
 #define FPS 60
 #define ARROW_SPEED 200
 #define MAX_ARROWS 10
-#define ARROW_SPEED 200
+#define MAX_MOBS 2
 
 typedef struct {
   SDL_Rect arrowRect;
@@ -32,11 +32,6 @@ typedef struct {
 } GameStatus;
 
 GameStatus gameStatus = {100, MAX_ARROWS}; // Example initial values
-
-bool CheckCollision(SDL_Rect a, SDL_Rect b) {
-  return (a.x + a.w > b.x) && (a.x < b.x + b.w) && (a.y + a.h > b.y) &&
-         (a.y < b.y + b.h);
-}
 
 void drawUI(SDL_Renderer *renderer, TTF_Font *font, GameStatus *gameStatus) {
   char info[256];
@@ -155,10 +150,7 @@ int main(int argv, char **args) {
   float arrowShootInterval = 2.0;
   srand(time(NULL));
   bool newImageVisible = true;
-///////////
-  Mob mob;  // Declare your mob variable
-  InitMob(&mob, rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50, 50, 100, 1);  // Initialize the mob
-//////////
+
   if (TTF_Init() != 0) {
     printf("Error initializing SDL_ttf: %s\n", TTF_GetError());
     SDL_Quit();
