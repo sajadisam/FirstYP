@@ -1,4 +1,5 @@
 #include "config.h"
+#include "menu.h"
 #include "player.h"
 #include "window.h"
 #include <SDL2/SDL.h>
@@ -204,12 +205,16 @@ int main(int argv, char **args) {
   int frame = 0;
   bool running = true;
 
+  SDL_Renderer *renderer = wnd->m_Renderer;
   bool closeWindow = false;
   SDL_Event event;
   TTF_Font *font = TTF_OpenFont("./resources/Sans.ttf", 24);
   if (!font) {
     printf("Failed to load : %s\n", TTF_GetError());
   }
+
+  menuInit(renderer, font);
+  GameState currentState = MAIN_MENU;
 
   bool isFullscreen = false;
   Player player;
@@ -226,117 +231,130 @@ int main(int argv, char **args) {
   player.speed = 5;
 
   while (!closeWindow) {
-    SDL_Rect nextPlayerFrame;
-    while (SDL_PollEvent(&event)) {
-      if (event.type == SDL_QUIT) {
+    switch (currentState) {
+      case MAIN_MENU:
+        currentState = menuLoop(renderer);
+        break;
+      case GAME_RUNNING:
+        //GAME CODE
+        SDL_Rect nextPlayerFrame;
+        while (SDL_PollEvent(&event)) {
+          if (event.type == SDL_QUIT) {
+            closeWindow = true;
+            break;
+          }
+          PlayerEvents(&event, &player, &nextPlayerFrame);
+        }
+
+        frameTime++;
+        if (frameTime == 5) {
+          frameTime = 0;
+          nextPlayerFrame.x += frameWidth;
+          if (nextPlayerFrame.x >= textureWidth)
+            nextPlayerFrame.x = 0;
+        }
+
+        mobFrameTime++;
+        if (mobFrameTime >= (FPS / 2)) {
+          mobFrameTime = 0;
+          frame = (frame + 1) % 3;
+          mobRect.x = frame * frameWidth;
+        }
+        endTick = SDL_GetTicks();
+        deltaTime =
+            (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
+        startTick = endTick;
+        printf("deltaTime: %f, arrowLossTimer: %f\n", deltaTime, arrowLossTimer);
+
+        arrowLossTimer += deltaTime;
+        if (arrowLossTimer >= 1.0f) {
+          if (gameStatus.arrowsRemaining > 0) {
+            gameStatus.arrowsRemaining--;
+          }
+          arrowLossTimer = 0;
+        }
+
+        drawUI(wnd->m_Renderer, font, &gameStatus);
+        SDL_RenderPresent(wnd->m_Renderer);
+
+        PlayerEventLoop(&player);
+
+        int deltaX = player.coordinate.x - mobPosition.x;
+        int deltaY = player.coordinate.y - mobPosition.y;
+        if (deltaX != 0) {
+          mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
+        }
+
+        if (deltaY != 0) {
+          mobPosition.y += (deltaY > 0 ? mobSPEED : -mobSPEED);
+        }
+        float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        int mobCurrentRow = 0;
+
+        updateArrows(arrows, deltaTime);
+        arrowShootTimer -= deltaTime;
+        if (arrowShootTimer <= 0) {
+          shootArrow(player.coordinate.x, player.coordinate.y,
+                    nextPlayerFrame.y / player.frame_size.h, arrows, arrowHeight,
+                    arrowWidth);               // Shoot an arrow
+          arrowShootTimer = arrowShootInterval; // Reset the timer
+        }
+
+        if (distance > 1) {
+          float dirX = deltaX / distance;
+          float dirY = deltaY / distance;
+          dirX = deltaX / distance;
+          dirY = deltaY / distance;
+          mobPosition.x += dirX * mobSPEED;
+          mobPosition.y += dirY * mobSPEED;
+          if (fabs(dirX) > fabs(dirY)) {
+            mobCurrentRow = (dirX > 0) ? 2 : 1; // Right or Left
+          } else {
+            mobCurrentRow = (dirY > 0) ? 0 : 3; // Down or Up
+          }
+          mobRect.y = mobCurrentRow * frameHeight;
+        }
+
+        SDL_RenderClear(wnd->m_Renderer);
+        SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
+        SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
+        SDL_RenderCopy(wnd->m_Renderer, pTexture,
+                      &(SDL_Rect){
+                          nextPlayerFrame.x,
+                          nextPlayerFrame.y,
+                          player.frame_size.w,
+                          player.frame_size.h,
+                      },
+                      (SDL_Rect *)&player.coordinate);
+
+        for (int i = 0; i < MAX_ARROWS; i++) {
+          if (arrows[i].active) {
+            printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
+                  arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
+            SDL_RenderCopyEx(wnd->m_Renderer, arrowTexture, &arrows[i].arrowRect,
+                            &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
+          }
+        }
+
+        if (newImageVisible) {
+          SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
+        }
+
+        if (CheckCollision(GetPlayerBoundingBox(&player), newImagePosition) &&
+            newImageVisible) {
+          newImageVisible = false;
+          player.speed *= 2;
+        }
+        //GAMECODE END
+        break;
+      case GAME_EXIT:
         closeWindow = true;
         break;
-      }
-      PlayerEvents(&event, &player, &nextPlayerFrame);
-    }
-
-    frameTime++;
-    if (frameTime == 5) {
-      frameTime = 0;
-      nextPlayerFrame.x += frameWidth;
-      if (nextPlayerFrame.x >= textureWidth)
-        nextPlayerFrame.x = 0;
-    }
-
-    mobFrameTime++;
-    if (mobFrameTime >= (FPS / 2)) {
-      mobFrameTime = 0;
-      frame = (frame + 1) % 3;
-      mobRect.x = frame * frameWidth;
-    }
-    endTick = SDL_GetTicks();
-    deltaTime =
-        (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
-    startTick = endTick;
-    printf("deltaTime: %f, arrowLossTimer: %f\n", deltaTime, arrowLossTimer);
-
-    arrowLossTimer += deltaTime;
-    if (arrowLossTimer >= 1.0f) {
-      if (gameStatus.arrowsRemaining > 0) {
-        gameStatus.arrowsRemaining--;
-      }
-      arrowLossTimer = 0;
-    }
-
-    drawUI(wnd->m_Renderer, font, &gameStatus);
-    SDL_RenderPresent(wnd->m_Renderer);
-
-    PlayerEventLoop(&player);
-
-    int deltaX = player.coordinate.x - mobPosition.x;
-    int deltaY = player.coordinate.y - mobPosition.y;
-    if (deltaX != 0) {
-      mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
-    }
-
-    if (deltaY != 0) {
-      mobPosition.y += (deltaY > 0 ? mobSPEED : -mobSPEED);
-    }
-    float distance = sqrt(deltaX * deltaX + deltaY * deltaY);
-
-    int mobCurrentRow = 0;
-
-    updateArrows(arrows, deltaTime);
-    arrowShootTimer -= deltaTime;
-    if (arrowShootTimer <= 0) {
-      shootArrow(player.coordinate.x, player.coordinate.y,
-                 nextPlayerFrame.y / player.frame_size.h, arrows, arrowHeight,
-                 arrowWidth);               // Shoot an arrow
-      arrowShootTimer = arrowShootInterval; // Reset the timer
-    }
-
-    if (distance > 1) {
-      float dirX = deltaX / distance;
-      float dirY = deltaY / distance;
-      dirX = deltaX / distance;
-      dirY = deltaY / distance;
-      mobPosition.x += dirX * mobSPEED;
-      mobPosition.y += dirY * mobSPEED;
-      if (fabs(dirX) > fabs(dirY)) {
-        mobCurrentRow = (dirX > 0) ? 2 : 1; // Right or Left
-      } else {
-        mobCurrentRow = (dirY > 0) ? 0 : 3; // Down or Up
-      }
-      mobRect.y = mobCurrentRow * frameHeight;
-    }
-
-    SDL_RenderClear(wnd->m_Renderer);
-    SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
-    SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
-    SDL_RenderCopy(wnd->m_Renderer, pTexture,
-                   &(SDL_Rect){
-                       nextPlayerFrame.x,
-                       nextPlayerFrame.y,
-                       player.frame_size.w,
-                       player.frame_size.h,
-                   },
-                   (SDL_Rect *)&player.coordinate);
-
-    for (int i = 0; i < MAX_ARROWS; i++) {
-      if (arrows[i].active) {
-        printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
-               arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
-        SDL_RenderCopyEx(wnd->m_Renderer, arrowTexture, &arrows[i].arrowRect,
-                         &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
-      }
-    }
-
-    if (newImageVisible) {
-      SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
-    }
-
-    if (CheckCollision(GetPlayerBoundingBox(&player), newImagePosition) &&
-        newImageVisible) {
-      newImageVisible = false;
-      player.speed *= 2;
     }
   }
 
+  menuCleanup();
   TTF_CloseFont(font);
   TTF_Quit();
   Window_Destroy(wnd);
