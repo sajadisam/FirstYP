@@ -1,12 +1,15 @@
 #include "config.h"
 #include "menu.h"
+#include "debug.h"
 #include "player.h"
 #include "mobs.h"
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_net.h>
 #include <SDL2/SDL_ttf.h>
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,6 +32,8 @@ typedef struct {
 typedef struct {
   int health;
   int arrowsRemaining;
+  Player player;
+  Player net_players[100];
 } GameStatus;
 
 GameStatus gameStatus = {100, MAX_ARROWS}; // Example initial values
@@ -143,6 +148,32 @@ void updateArrows(Arrow *arrows, float deltaTime) {
   }
 }
 
+void *server_recv(void *data) {
+  TCPsocket *socket = (TCPsocket *)data;
+  while (true) {
+    char message[1024];
+    int len = SDLNet_TCP_Recv(*socket, message, 1024);
+    printf("%s\n", message);
+  }
+
+  return NULL;
+}
+
+int initalize_net_player(Player *player) {
+  IPaddress ip;
+  if (SDLNet_ResolveHost(&ip, "127.0.0.1", 3030) == -1) {
+    ERR("Failed to resolve host '%s'\n", SDLNet_GetError());
+    return 1;
+  }
+  player->socket = (TCPsocket *)SDLNet_TCP_Open(&ip);
+
+  if (!player->socket) {
+    ERR("Failed to open a tcp connection '%s'\n", SDLNet_GetError());
+    return 1;
+  }
+  return 0;
+}
+
 int main(int argv, char **args) {
   float arrowLossTimer = 0;
   Arrow arrows[MAX_ARROWS];
@@ -200,20 +231,29 @@ int main(int argv, char **args) {
 
   menuInit(renderer, font);
   GameState currentState = MAIN_MENU;
+  if (SDLNet_Init() == -1) {
+    ERR("Failed to initialize SDL '%s'\n", SDL_GetError());
+    return 1;
+  }
 
   bool isFullscreen = false;
-  Player player;
-  player.movement_flags = (PlayerMovementFlags){};
-  player.coordinate = (SDL_Point){
+  Player *player = &gameStatus.player;
+  player->movement_flags = (PlayerMovementFlags){};
+  player->coordinate = (SDL_Point){
       (WINDOW_WIDTH - frameWidth) / 2,
       (WINDOW_HEIGHT - frameHeight) / 2,
   };
 
-  player.frame_size = (Vec2){
+  player->frame_size = (Vec2){
       frameWidth,
       frameHeight,
   };
-  player.speed = 5;
+  player->speed = 5;
+
+  initalize_net_player(player);
+
+  pthread_t thread_id;
+  pthread_create(&thread_id, NULL, server_recv, &player->socket);
 
   while (!closeWindow) {
     switch (currentState) {

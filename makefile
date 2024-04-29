@@ -1,25 +1,22 @@
 ifeq ($(OS), Windows_NT) 
 	INCLUDE = C:\msys64\mingw64\include\SDL2
-	LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2 -mwindows -mconsole -lm
+	LDFLAGS = -lmingw32 -lSDL2main -lSDL2_image -lSDL2_ttf -lSDL2_net -lSDL2 -mwindows -mconsole -lm
 	LIBS := -L C:\msys64\mingw64\lib
 else 
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S), Linux)
 		INCLUDE = /usr/include/SDL2
-		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lm
+		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net -lm
 	endif
 	ifeq ($(UNAME_S), Darwin)
 		INCLUDE = /opt/homebrew/include
 		LIBS := -L /opt/homebrew/lib
-		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lm
+		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_net -lm
 	endif
 endif
 
-
-
 CC=gcc
 CFLAGS = -g -I$(INCLUDE) -c 
-
 
 OBJ := firstyp
 SRC_DIR := src/

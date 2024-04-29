@@ -1,5 +1,8 @@
 #include "player.h"
 #include "config.h"
+#include <SDL2/SDL_net.h>
+#include <stdio.h>
+#include <string.h>
 
 SDL_Rect GetPlayerBoundingBox(Player *player) {
   return (SDL_Rect){
@@ -20,6 +23,17 @@ void PlayerEventLoop(Player *player) {
     player->coordinate.x += -player->speed;
   if (player->movement_flags.right && !player->movement_flags.left)
     player->coordinate.x += player->speed;
+
+  if (player->movement_flags.up || player->movement_flags.down ||
+      player->movement_flags.right || player->movement_flags.left) {
+    char message[1024];
+    sprintf(message, "PLAYERMOVE %d %d", player->coordinate.y,
+            player->coordinate.x);
+    int len = strlen(message);
+    message[len - 1] = '\0';
+    if (player->socket != NULL)
+      SDLNet_TCP_Send(player->socket, message, len);
+  }
 
   float newPlayerX = player->coordinate.x;
   float newPlayerY = player->coordinate.y;

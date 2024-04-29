@@ -2,6 +2,7 @@
 #define _PLAYER_
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_net.h>
 #include <SDL2/SDL_rect.h>
 #include <stdbool.h>
 
@@ -18,6 +19,7 @@ typedef struct {
   SDL_Point coordinate;
   Vec2 frame_size;
   int speed;
+  TCPsocket *socket;
 } Player;
 
 SDL_Rect GetPlayerBoundingBox(Player *player);
