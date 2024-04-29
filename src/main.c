@@ -148,12 +148,26 @@ void updateArrows(Arrow *arrows, float deltaTime) {
   }
 }
 
+typedef struct {
+  TCPsocket *socket;
+  Player *net_player;
+} RecvArg;
+
 void *server_recv(void *data) {
-  TCPsocket *socket = (TCPsocket *)data;
+  TCPsocket *socket = ((RecvArg *)data)->socket;
+  Player *net_player = ((RecvArg *)data)->net_player;
+  // Player *net_player = ((RecvArg *)data)->net_player;
+
   while (true) {
     char message[1024];
-    int len = SDLNet_TCP_Recv(*socket, message, 1024);
-    printf("%s\n", message);
+    int len = SDLNet_TCP_Recv(socket, message, 1024);
+    char opcode[1024];
+    int x = 0;
+    int y = 0;
+
+    sscanf(message, "%s %d, %d ", opcode, &net_player->coordinate.x,
+           &net_player->coordinate.y);
+    // printf("opcode(%s) x(%d) y(%d)\n", opcode, x, y);
   }
 
   return NULL;
@@ -249,11 +263,24 @@ int main(int argv, char **args) {
       frameHeight,
   };
   player->speed = 5;
-
   initalize_net_player(player);
 
+  Player net_player;
+  net_player.movement_flags = (PlayerMovementFlags){};
+  net_player.coordinate = (SDL_Point){
+      (WINDOW_WIDTH - frameWidth) / 2,
+      (WINDOW_HEIGHT - frameHeight) / 2,
+  };
+  net_player.frame_size = (Vec2){
+      frameWidth,
+      frameHeight,
+  };
+  net_player.speed = 5;
+
   pthread_t thread_id;
-  pthread_create(&thread_id, NULL, server_recv, &player->socket);
+  pthread_create(
+      &thread_id, NULL, server_recv,
+      &(RecvArg){.socket = player->socket, .net_player = &net_player});
 
   while (!closeWindow) {
     switch (currentState) {

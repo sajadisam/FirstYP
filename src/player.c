@@ -14,27 +14,7 @@ SDL_Rect GetPlayerBoundingBox(Player *player) {
   };
 }
 
-void PlayerEventLoop(Player *player) {
-  if (player->movement_flags.up && !player->movement_flags.down)
-    player->coordinate.y += -player->speed;
-  if (player->movement_flags.down && !player->movement_flags.up)
-    player->coordinate.y += player->speed;
-  if (player->movement_flags.left && !player->movement_flags.right)
-    player->coordinate.x += -player->speed;
-  if (player->movement_flags.right && !player->movement_flags.left)
-    player->coordinate.x += player->speed;
-
-  if (player->movement_flags.up || player->movement_flags.down ||
-      player->movement_flags.right || player->movement_flags.left) {
-    char message[1024];
-    sprintf(message, "PLAYERMOVE %d %d", player->coordinate.y,
-            player->coordinate.x);
-    int len = strlen(message);
-    message[len - 1] = '\0';
-    if (player->socket != NULL)
-      SDLNet_TCP_Send(player->socket, message, len);
-  }
-
+void ConstrainWithinWindow(Player *player) {
   float newPlayerX = player->coordinate.x;
   float newPlayerY = player->coordinate.y;
 
@@ -51,6 +31,33 @@ void PlayerEventLoop(Player *player) {
 
   player->coordinate.x = newPlayerX;
   player->coordinate.y = newPlayerY;
+}
+
+void PlayerEventLoop(Player *player) {
+  if (player->movement_flags.up && !player->movement_flags.down)
+    player->coordinate.y += -player->speed;
+  if (player->movement_flags.down && !player->movement_flags.up)
+    player->coordinate.y += player->speed;
+
+  if (player->movement_flags.left && !player->movement_flags.right)
+    player->coordinate.x += -player->speed;
+  if (player->movement_flags.right && !player->movement_flags.left)
+    player->coordinate.x += player->speed;
+
+  ConstrainWithinWindow(player);
+
+  // Send position to server
+  if (player->movement_flags.up || player->movement_flags.down ||
+      player->movement_flags.right || player->movement_flags.left) {
+    char message[1024];
+    printf("sending %d %d\n", player->coordinate.x, player->coordinate.y);
+    sprintf(message, "PLAYERMOVE %d, %d ", player->coordinate.x,
+            player->coordinate.y);
+    int len = strlen(message);
+    message[len - 1] = '\0';
+    if (player->socket != NULL)
+      SDLNet_TCP_Send(player->socket, message, len);
+  }
 }
 
 void PlayerEvents(SDL_Event *event, Player *player, SDL_Rect *nextPlayerFrame) {
