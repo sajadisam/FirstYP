@@ -1,8 +1,8 @@
 #include "config.h"
-#include "menu.h"
 #include "debug.h"
-#include "player.h"
+#include "menu.h"
 #include "mobs.h"
+#include "player.h"
 #include "window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -75,7 +75,8 @@ void initArrows(Arrow *arrows, GameStatus *gameStatus, int amountArrows) {
   gameStatus->arrowsRemaining = amountArrows;
 }
 
-void shootArrow(int playerX, int playerY, int direction, Arrow *arrows, int height, int width) {
+void shootArrow(int playerX, int playerY, int direction, Arrow *arrows,
+                int height, int width) {
   int frameWidth, frameHeight;
   int column = 0;
   frameWidth = width / 2;
@@ -189,6 +190,7 @@ int initalize_net_player(Player *player) {
 }
 
 int main(int argv, char **args) {
+  int mobSPEED = 1;
   float arrowLossTimer = 0;
   Arrow arrows[MAX_ARROWS];
   float arrowShootTimer = 0;
@@ -222,10 +224,15 @@ int main(int argv, char **args) {
   int textureWidth, textureHeight, frameWidth, frameHeight, arrowWidth,
       arrowHeight;
   int frameTime = 0;
+  int mobFrameTime = 0;
   int newX = rand() % WINDOW_WIDTH;
   int newY = rand() % WINDOW_HEIGHT;
   SDL_Rect newImagePosition = {newX, newY, 50, 50};
   SDL_Rect mapRect = {0, 0, WINDOW_WIDTH, WINDOW_HEIGHT};
+  SDL_Rect mobRect;
+
+  SDL_Rect mobPosition = {rand() % WINDOW_WIDTH, rand() % WINDOW_HEIGHT, 50,
+                          50};
 
   SDL_QueryTexture(pTexture, NULL, NULL, &textureWidth, &textureHeight);
   SDL_QueryTexture(arrowTexture, NULL, NULL, &arrowWidth, &arrowHeight);
@@ -284,18 +291,19 @@ int main(int argv, char **args) {
 
   while (!closeWindow) {
     switch (currentState) {
-      case MAIN_MENU:
-        currentState = menuLoop(renderer);
-        break;
-      case GAME_RUNNING:
-        //GAME CODE
+    case MAIN_MENU:
+      currentState = menuLoop(renderer);
+      break;
+    case GAME_RUNNING:
+      // GAME CODE
+      {
         SDL_Rect nextPlayerFrame;
         while (SDL_PollEvent(&event)) {
           if (event.type == SDL_QUIT) {
             closeWindow = true;
             break;
           }
-          PlayerEvents(&event, &player, &nextPlayerFrame);
+          PlayerEvents(&event, player, &nextPlayerFrame);
         }
 
         frameTime++;
@@ -316,7 +324,8 @@ int main(int argv, char **args) {
         deltaTime =
             (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
         startTick = endTick;
-        printf("deltaTime: %f, arrowLossTimer: %f\n", deltaTime, arrowLossTimer);
+        printf("deltaTime: %f, arrowLossTimer: %f\n", deltaTime,
+               arrowLossTimer);
 
         arrowLossTimer += deltaTime;
         if (arrowLossTimer >= 1.0f) {
@@ -329,10 +338,10 @@ int main(int argv, char **args) {
         drawUI(wnd->m_Renderer, font, &gameStatus);
         SDL_RenderPresent(wnd->m_Renderer);
 
-        PlayerEventLoop(&player);
+        PlayerEventLoop(player);
 
-        int deltaX = player.coordinate.x - mobPosition.x;
-        int deltaY = player.coordinate.y - mobPosition.y;
+        int deltaX = player->coordinate.x - mobPosition.x;
+        int deltaY = player->coordinate.y - mobPosition.y;
         if (deltaX != 0) {
           mobPosition.x += (deltaX > 0 ? mobSPEED : -mobSPEED);
         }
@@ -347,9 +356,10 @@ int main(int argv, char **args) {
         updateArrows(arrows, deltaTime);
         arrowShootTimer -= deltaTime;
         if (arrowShootTimer <= 0) {
-          shootArrow(player.coordinate.x, player.coordinate.y,
-                    nextPlayerFrame.y / player.frame_size.h, arrows, arrowHeight,
-                    arrowWidth);               // Shoot an arrow
+          shootArrow(player->coordinate.x, player->coordinate.y,
+                     nextPlayerFrame.y / player->frame_size.h, arrows,
+                     arrowHeight,
+                     arrowWidth);               // Shoot an arrow
           arrowShootTimer = arrowShootInterval; // Reset the timer
         }
 
@@ -372,37 +382,38 @@ int main(int argv, char **args) {
         SDL_RenderCopy(wnd->m_Renderer, mapTexture, NULL, &mapRect);
         SDL_RenderCopy(wnd->m_Renderer, mobTexture, &mobRect, &mobPosition);
         SDL_RenderCopy(wnd->m_Renderer, pTexture,
-                      &(SDL_Rect){
-                          nextPlayerFrame.x,
-                          nextPlayerFrame.y,
-                          player.frame_size.w,
-                          player.frame_size.h,
-                      },
-                      (SDL_Rect *)&player.coordinate);
+                       &(SDL_Rect){
+                           nextPlayerFrame.x,
+                           nextPlayerFrame.y,
+                           player->frame_size.w,
+                           player->frame_size.h,
+                       },
+                       (SDL_Rect *)&player->coordinate);
 
-        for (int i = 0; i < MAX_ARROWS; i++) {
-          if (arrows[i].active) {
-            printf("Arrow %d: Active %d, Position (%f, %f)\n", i, arrows[i].active,
-                  arrows[i].arrowPosition.x, arrows[i].arrowPosition.y);
-            SDL_RenderCopyEx(wnd->m_Renderer, arrowTexture, &arrows[i].arrowRect,
-                            &arrows[i].arrowPosition, 0, NULL, arrows[i].flip);
-          }
-        }
+        SDL_RenderCopy(wnd->m_Renderer, pTexture,
+                       &(SDL_Rect){
+                           nextPlayerFrame.x,
+                           nextPlayerFrame.y,
+                           net_player.frame_size.w,
+                           net_player.frame_size.h,
+                       },
+                       (SDL_Rect *)&net_player.coordinate);
 
         if (newImageVisible) {
           SDL_RenderCopy(wnd->m_Renderer, newTexture, NULL, &newImagePosition);
         }
 
-        if (CheckCollision(GetPlayerBoundingBox(&player), newImagePosition) &&
+        if (CheckCollision(GetPlayerBoundingBox(player), newImagePosition) &&
             newImageVisible) {
           newImageVisible = false;
-          player.speed *= 2;
+          player->speed *= 2;
         }
-        //GAMECODE END
-        break;
-      case GAME_EXIT:
-        closeWindow = true;
-        break;
+        // GAMECODE END
+      }
+      break;
+    case GAME_EXIT:
+      closeWindow = true;
+      break;
     }
   }
 
