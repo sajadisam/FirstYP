@@ -320,6 +320,11 @@ int main(int argv, char **args) {
           frame = (frame + 1) % 3;
           mobRect.x = frame * frameWidth;
         }
+
+        TrySpawnMob(); // Try to add a new mob
+        UpdateAndRenderMobs(wnd->m_Renderer, mobTexture, player->coordinate);
+        CheckMobsCollision(GetPlayerBoundingBox(player));
+
         endTick = SDL_GetTicks();
         deltaTime =
             (endTick - startTick) / 1000.0f; // Convert milliseconds to seconds
