@@ -1,0 +1,5 @@
+.vscode
+client*
+
+obj/*
+!obj/.gitkeep
