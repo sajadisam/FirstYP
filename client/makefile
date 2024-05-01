@@ -28,10 +28,13 @@ OBJ_DIR := obj/
 SOURCE_FILES := $(wildcard $(SRC_DIR)*.c)
 OBJECT_FILES += $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
 
-# menu
-OTHER_FILES := $(wildcard $(SRC_DIR)menu/*.c)
-OBJECT_FILES += $(patsubst $(SRC_DIR)/menu/%.c,$(OBJ_DIR)%.o,$(OTHER_FILES))
+# player
+FOLDER := player/
+OBJECT_FILES += $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
+# window
+FOLDER := window/
+OBJECT_FILES += $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
