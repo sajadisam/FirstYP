@@ -1,7 +1,7 @@
-#include "config.h"
 #include "game.h"
 #include "player/player.h"
 #include "setup.h"
+#include "shared/config.h"
 #include "ui/sprite.h"
 #include "window/window.h"
 #include "window/window_event_callback.h"
