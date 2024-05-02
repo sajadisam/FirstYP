@@ -15,8 +15,6 @@ Window *window_create(const char *name, int width, int height);
 
 void window_destroy(Window *window);
 
-SDL_Texture *create_texture(Window *wnd, const char *path);
-
 /*
  *  Handles a single window event by passing it to the callback
  *

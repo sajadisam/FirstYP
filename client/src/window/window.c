@@ -18,13 +18,6 @@ typedef void *(*EventLoopCallback)(SDL_Event *event, void *);
 SDL_Renderer *get_window_renderer(Window *window) { return window->m_Renderer; }
 SDL_Window *get_window_sdlwindow(Window *window) { return window->m_Window; }
 
-// TODO(Xelian): move to shared
-void on_sdl_error() {
-  ERR("%s\n", SDL_GetError());
-  SDL_Quit();
-  exit(5);
-}
-
 Window *window_create(const char *name, int width, int height) {
   INFO("Creating a window\n");
 
@@ -53,21 +46,6 @@ void window_destroy(Window *window) {
   SDL_DestroyRenderer(window->m_Renderer);
   SDL_DestroyWindow(window->m_Window);
   free(window);
-}
-
-SDL_Texture *create_texture(Window *wnd, const char *path) {
-  SDL_Surface *pSurface = IMG_Load(path);
-  if (!pSurface)
-    on_sdl_error();
-
-  SDL_Texture *pTexture =
-      SDL_CreateTextureFromSurface(wnd->m_Renderer, pSurface);
-
-  SDL_FreeSurface(pSurface);
-  if (!pTexture)
-    on_sdl_error();
-
-  return pTexture;
 }
 
 void *window_event_loop(Window *window, EventLoopCallback callback, void *arg) {
