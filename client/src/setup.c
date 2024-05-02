@@ -1,4 +1,4 @@
-#include "../../shared/include/debug.h"
+#include "shared/debug.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include <stdbool.h>
