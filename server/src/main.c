@@ -1,4 +1,4 @@
-#include "../../shared/include/debug.h"
+#include "shared/src/debug.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_endian.h>
 #include <SDL2/SDL_error.h>

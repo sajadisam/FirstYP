@@ -1,4 +1,5 @@
-#include "../../../shared/include/debug.h"
+#include "../shared/debug.h"
+#include "../shared/misc.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
