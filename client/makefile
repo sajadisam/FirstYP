@@ -29,12 +29,20 @@ SOURCE_FILES := $(wildcard $(SRC_DIR)*.c)
 OBJECT_FILES += $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
 
 # player
-FOLDER := player/
-OBJECT_FILES += $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+FOLDER := player
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
 # window
-FOLDER := window/
-OBJECT_FILES += $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+FOLDER := window
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+
+# UI
+FOLDER := ui
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+
+# net
+FOLDER := net
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
@@ -43,6 +51,7 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 # Build the binary by linking the intermediate files
 $(OBJ): $(OBJECT_FILES)
 	$(CC) $^ -o $(OBJ) $(LDFLAGS) $(LIBS)
+	echo $(OBJECT_FILES)
 
 clean: $(OBJ_DIR)*.o
 	rm $^
