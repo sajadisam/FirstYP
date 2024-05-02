@@ -44,6 +44,14 @@ OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.
 FOLDER := net
 OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
+# math
+FOLDER := math
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+
+# shared
+FOLDER := shared
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(CFLAGS) $^ -o $@
