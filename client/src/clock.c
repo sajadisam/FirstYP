@@ -34,9 +34,9 @@ Timer *create_timer(Clock *clock, int interval) {
   return timestop;
 }
 
-bool timer_finished(Timer *timestop) {
-  if (timestop->passed >= timestop->interval) {
-    timestop->passed = 0;
+bool timer_finished(Timer *timer) {
+  if (timer && timer->passed >= timer->interval) {
+    timer->passed = 0;
     return true;
   }
   return false;
