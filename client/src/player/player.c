@@ -18,6 +18,7 @@ Player *create_player(SpriteSheet *sprite) {
   player->coordinate.y = 0;
   player->sprite = sprite;
   player->flags = IDLE;
+  player->speed = 2;
   return player;
 }
 
@@ -34,3 +35,15 @@ PlayerFlag get_player_flags(Player *player) { return player->flags; }
 void set_player_flags(Player *player, PlayerFlag flags) {
   player->flags = flags;
 }
+
+SDL_Point get_player_coordinates(Player *player) { return player->coordinate; }
+void set_player_coordinates(Player *player, SDL_Point coordinate) {
+  player->coordinate = coordinate;
+}
+
+void player_move_down(Player *player) { player->coordinate.y += player->speed; }
+void player_move_up(Player *player) { player->coordinate.y -= player->speed; }
+void player_move_right(Player *player) {
+  player->coordinate.x += player->speed;
+}
+void player_move_left(Player *player) { player->coordinate.x -= player->speed; }
