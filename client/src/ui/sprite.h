@@ -1,7 +1,7 @@
 #ifndef _SPRITE_
 #define _SPRITE_
 
-#include "../game.h"
+// #include "../game.h"
 #include "../math/size.h"
 #include "../window/window.h"
 #include <SDL2/SDL.h>
@@ -19,8 +19,9 @@ SDL_Rect get_sprite_size(Sprite *sprite);
  */
 Sprite *create_sprite(Window *window, const char *path);
 
-void render_sprite(Game *game, Sprite *sprite, Size size, SDL_Point coordinate);
-void render_sprite_loop(Game *game, Sprite *sprite);
+void render_sprite(struct Game *game, Sprite *sprite, Size size,
+                   SDL_Point coordinate);
+void render_sprite_loop(struct Game *game, Sprite *sprite);
 
 /*
  * Destroy a created sprite
