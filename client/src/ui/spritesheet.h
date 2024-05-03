@@ -1,7 +1,9 @@
 #ifndef _SPRITESHEET_
 #define _SPRITESHEET_
 
-#include "../game.h"
+// #include "../game.h"
+typedef struct game Game;
+
 #include "../math/size.h"
 #include "../window/window.h"
 

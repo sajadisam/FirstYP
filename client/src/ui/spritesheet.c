@@ -1,7 +1,8 @@
+#include "../game.h"
+#include "../window/window.h"
 #include "sprite.h"
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
-#include <stdlib.h>
 
 typedef struct {
   int currentHFrame;
