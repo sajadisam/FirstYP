@@ -23,6 +23,11 @@ void set_current_frame(SpriteSheet *sprite, int frame);
 SpriteSheet *create_spritesheet(Window *window, const char *path, int hFrames,
                                 int vFrames);
 
+int get_spritesheet_current_h_frame(SpriteSheet *sprite);
+int get_spritesheet_current_v_frame(SpriteSheet *sprite);
+void set_spritesheet_current_h_frame(SpriteSheet *sprite, int frame);
+void set_spritesheet_current_v_frame(SpriteSheet *sprite, int frame);
+
 /*
  * Renders the sprite from the sprite sheet based on the current frame set by
  * set_current_frame()

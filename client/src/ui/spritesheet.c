@@ -1,4 +1,5 @@
 #include "../game.h"
+#include "../shared/debug.h"
 #include "../window/window.h"
 #include "sprite.h"
 #include <SDL2/SDL_rect.h>
@@ -23,9 +24,20 @@ SpriteSheet *create_spritesheet(Window *window, const char *path, int hFrames,
   return sprite;
 }
 
+int get_spritesheet_current_h_frame(SpriteSheet *sprite) {
+  return sprite->currentHFrame;
+}
+int get_spritesheet_current_v_frame(SpriteSheet *sprite) {
+  return sprite->currentVFrame;
+}
+void set_spritesheet_current_h_frame(SpriteSheet *sprite, int frame) {
+  sprite->currentHFrame = frame;
+}
+void set_spritesheet_current_v_frame(SpriteSheet *sprite, int frame) {
+  sprite->currentVFrame = frame;
+}
 void set_current_frame(SpriteSheet *sprite, int frame) {
-  // sprite->horizontalFrames = ceil(sprite->horizontalFrames / frame);
-  // sprite->verticalFrames = frame;
+  sprite->currentHFrame = ceil(sprite->hFrames / frame);
 }
 
 void render_spritesheet(Game *game, SpriteSheet *sprite, Size size,
