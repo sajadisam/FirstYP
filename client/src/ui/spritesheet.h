@@ -1,38 +1,33 @@
 #ifndef _SPRITESHEET_
 #define _SPRITESHEET_
 
-// #include "../game.h"
-typedef struct game Game;
-
 #include "../math/size.h"
 #include "../window/window.h"
 
 // Composes a sprite to be animatable
 typedef struct spriteSheet SpriteSheet;
-
-/*
- * Sets the current frame to be rendered
- * @arg sprite: Sprite to set the current frame of
- * @arg frame: frame index going clockwise
- */
-void set_current_frame(SpriteSheet *sprite, int frame);
+typedef struct game Game;
 
 /*
  * Create an spritesheet based on vertical and horizontal frames
  */
-SpriteSheet *create_spritesheet(Window *window, const char *path, int hFrames,
-                                int vFrames);
-
-int get_spritesheet_current_h_frame(SpriteSheet *sprite);
-int get_spritesheet_current_v_frame(SpriteSheet *sprite);
-void set_spritesheet_current_h_frame(SpriteSheet *sprite, int frame);
-void set_spritesheet_current_v_frame(SpriteSheet *sprite, int frame);
+SpriteSheet *create_spritesheet(const Window *window, const char *path,
+                                const int hFrames, const int vFrames);
 
 /*
  * Renders the sprite from the sprite sheet based on the current frame set by
  * set_current_frame()
  */
-void render_spritesheet(Game *game, SpriteSheet *sprite, Size size,
-                        SDL_Point coordinate);
+void render_spritesheet(const Game *game, const SpriteSheet *sprite,
+                        const Size size, const SDL_Point coordinate);
+
+/*
+ * @arg frame: index going clockwise
+ */
+void set_current_frame(SpriteSheet *sprite, const int frame);
+int get_spritesheet_current_h_frame(const SpriteSheet *sprite);
+int get_spritesheet_current_v_frame(const SpriteSheet *sprite);
+void set_spritesheet_current_h_frame(SpriteSheet *sprite, const int frame);
+void set_spritesheet_current_v_frame(SpriteSheet *sprite, const int frame);
 
 #endif // !_SPRITESHEET_

@@ -10,14 +10,6 @@ typedef struct {
   Clock *clock;
 } Game;
 
-SDL_Renderer *get_game_renderer(Game *game) {
-  return get_window_renderer(game->window);
-}
-Window *get_game_window(Game *game) { return game->window; }
-Player *get_game_player(Game *game) { return game->player; }
-Sprite *get_game_map(Game *game) { return game->map; }
-Clock *get_game_clock(Game *game) { return game->clock; }
-
 Game *create_game(Window *window, Player *player, Sprite *map, Clock *clock) {
   Game *game = malloc(sizeof(Game));
   game->window = window;
@@ -26,3 +18,11 @@ Game *create_game(Window *window, Player *player, Sprite *map, Clock *clock) {
   game->clock = clock;
   return game;
 }
+
+SDL_Renderer *get_game_renderer(const Game *game) {
+  return get_window_renderer(game->window);
+}
+Window *get_game_window(const Game *game) { return game->window; }
+Player *get_game_player(const Game *game) { return game->player; }
+Sprite *get_game_map(const Game *game) { return game->map; }
+Clock *get_game_clock(const Game *game) { return game->clock; }

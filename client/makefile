@@ -61,6 +61,9 @@ $(OBJ): $(OBJECT_FILES)
 	$(CC) $^ -o $(OBJ) $(LDFLAGS) $(LIBS)
 	echo $(OBJECT_FILES)
 
+start:
+	clear && make && ./client
+
 clean: $(OBJ_DIR)*.o
 	rm $^
 

@@ -21,10 +21,10 @@ typedef struct game Game;
 Game *create_game(Window *window, Player *player, struct Sprite *map,
                   Clock *clock);
 
-SDL_Renderer *get_game_renderer(Game *game);
-Window *get_game_window(Game *game);
-Player *get_game_player(Game *game);
-Clock *get_game_clock(Game *game);
-struct Sprite *get_game_map(Game *game);
+SDL_Renderer *get_game_renderer(const Game *game);
+Window *get_game_window(const Game *game);
+Player *get_game_player(const Game *game);
+Clock *get_game_clock(const Game *game);
+struct Sprite *get_game_map(const Game *game);
 
 #endif // !_GAME_

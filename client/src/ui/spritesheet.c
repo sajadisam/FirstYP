@@ -1,5 +1,4 @@
 #include "../game.h"
-#include "../shared/debug.h"
 #include "../window/window.h"
 #include "sprite.h"
 #include <SDL2/SDL_rect.h>
@@ -13,8 +12,8 @@ typedef struct {
   Sprite *sprite;
 } SpriteSheet;
 
-SpriteSheet *create_spritesheet(Window *window, const char *path, int hFrames,
-                                int vFrames) {
+SpriteSheet *create_spritesheet(const Window *window, const char *path,
+                                const int hFrames, const int vFrames) {
   SpriteSheet *sprite = malloc(sizeof(SpriteSheet));
   sprite->sprite = create_sprite(window, path);
   sprite->hFrames = hFrames;
@@ -23,25 +22,8 @@ SpriteSheet *create_spritesheet(Window *window, const char *path, int hFrames,
   sprite->currentVFrame = 0;
   return sprite;
 }
-
-int get_spritesheet_current_h_frame(SpriteSheet *sprite) {
-  return sprite->currentHFrame;
-}
-int get_spritesheet_current_v_frame(SpriteSheet *sprite) {
-  return sprite->currentVFrame;
-}
-void set_spritesheet_current_h_frame(SpriteSheet *sprite, int frame) {
-  sprite->currentHFrame = frame;
-}
-void set_spritesheet_current_v_frame(SpriteSheet *sprite, int frame) {
-  sprite->currentVFrame = frame;
-}
-void set_current_frame(SpriteSheet *sprite, int frame) {
-  sprite->currentHFrame = ceil(sprite->hFrames / frame);
-}
-
-void render_spritesheet(Game *game, SpriteSheet *sprite, Size size,
-                        SDL_Point coordinate) {
+void render_spritesheet(const Game *game, const SpriteSheet *sprite,
+                        const Size size, const SDL_Point coordinate) {
   SDL_Rect spriteSize = get_sprite_size(sprite->sprite);
   SDL_Texture *texture = get_sprite_texture(sprite->sprite);
   SDL_Renderer *renderer = get_game_renderer(game);
@@ -53,4 +35,20 @@ void render_spritesheet(Game *game, SpriteSheet *sprite, Size size,
                              vertical},
                  &(SDL_Rect){coordinate.x, coordinate.y, horizontal + size.w,
                              vertical + size.h});
+}
+
+int get_spritesheet_current_h_frame(const SpriteSheet *sprite) {
+  return sprite->currentHFrame;
+}
+int get_spritesheet_current_v_frame(const SpriteSheet *sprite) {
+  return sprite->currentVFrame;
+}
+void set_spritesheet_current_h_frame(SpriteSheet *sprite, const int frame) {
+  sprite->currentHFrame = frame;
+}
+void set_spritesheet_current_v_frame(SpriteSheet *sprite, const int frame) {
+  sprite->currentVFrame = frame;
+}
+void set_current_frame(SpriteSheet *sprite, const int frame) {
+  sprite->currentHFrame = ceil(sprite->hFrames / frame);
 }

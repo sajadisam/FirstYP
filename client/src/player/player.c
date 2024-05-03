@@ -23,7 +23,6 @@ Player *create_player(SpriteSheet *sprite) {
 }
 
 void destroy_player(Player *player) {
-  // Check to see if the player is valid
   if (player) {
     free(player);
     player = NULL;

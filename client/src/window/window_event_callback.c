@@ -3,18 +3,16 @@
 #include "../ui/spritesheet.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
-#include <stdio.h>
 
 /*
  * A callback that gets triggered based on window event
  */
-void *window_event_callback(SDL_Event *event, void *arg) {
+void *window_event_callback(const SDL_Event *event, void *arg) {
   if (event->type == SDL_QUIT)
     return true;
   Game *game = arg;
   Player *player = get_game_player(game);
   PlayerFlag flags = get_player_flags(player);
-
   switch (event->type) {
   case SDL_KEYDOWN:
     if (event->key.keysym.scancode == SDL_SCANCODE_UP)

@@ -9,26 +9,26 @@
  */
 typedef struct player Player;
 
-struct SpriteSheet *get_player_spritesheet(Player *player);
-
-PlayerFlag get_player_flags(Player *player);
-void set_player_flags(Player *player, PlayerFlag flags);
-SDL_Point get_player_coordinates(Player *player);
-void set_player_coordinates(Player *player, SDL_Point coordinate);
-
-void player_move_up(Player *player);
-void player_move_down(Player *player);
-void player_move_right(Player *player);
-void player_move_left(Player *player);
-
 /*
  * Create a player
  */
 Player *create_player(struct SpriteSheet *sprite);
 
 /*
- * Create a networkable player
+ * Destroy a player
  */
 void destroy_player(Player *player);
+
+struct SpriteSheet *get_player_spritesheet(const Player *player);
+
+PlayerFlag get_player_flags(const Player *player);
+void set_player_flags(Player *player, PlayerFlag flags);
+SDL_Point get_player_coordinates(const Player *player);
+void set_player_coordinates(Player *player, const SDL_Point coordinate);
+
+void player_move_up(Player *player);
+void player_move_down(Player *player);
+void player_move_right(Player *player);
+void player_move_left(Player *player);
 
 #endif // !_PLAYER_

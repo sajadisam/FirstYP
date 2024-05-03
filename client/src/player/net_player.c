@@ -16,7 +16,6 @@ NetPlayer *create_net_player(SpriteSheet *sprite) {
 }
 
 void destroy_net_player(NetPlayer *player) {
-  // Free player and then the NetPlayer
   if (player) {
     destroy_player(player->player);
     free(player);

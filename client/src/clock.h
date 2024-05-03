@@ -8,6 +8,10 @@ typedef struct timer Timer;
 
 Clock *create_clock();
 Timer *create_timer(Clock *clock, int interval);
+
+/*
+ * Checks if the timer has finished ticking
+ */
 bool timer_finished(Timer *timer);
 
 /*
