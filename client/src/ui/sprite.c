@@ -16,7 +16,7 @@ typedef struct {
 SDL_Texture *get_sprite_texture(Sprite *sprite) { return sprite->texture; }
 SDL_Rect get_sprite_size(Sprite *sprite) { return sprite->size; }
 
-Sprite *create_sprite(Window *window, const char *path, SDL_Point coordinate) {
+Sprite *create_sprite(Window *window, const char *path) {
   SDL_Surface *pSurface = IMG_Load(path);
   if (!pSurface)
     on_sdl_error();
@@ -34,8 +34,8 @@ Sprite *create_sprite(Window *window, const char *path, SDL_Point coordinate) {
   sprite->texture = texture;
   sprite->size.w = width;
   sprite->size.h = width;
-  sprite->size.x = coordinate.x;
-  sprite->size.y = coordinate.y;
+  sprite->size.x = 0;
+  sprite->size.y = 0;
   return sprite;
 }
 
@@ -47,10 +47,19 @@ void destroy_sprite(Sprite *sprite) {
   }
 }
 
+void render_sprite(Game *game, Sprite *sprite, Size size,
+                   SDL_Point coordinate) {
+  // SDL_RenderCopy(get_game_renderer(game), get_sprite_texture(sprite), NULL,
+  //                &(SDL_Rect){coordinate.x, coordinate.y,
+  //                            sprite->size.w + size.w, sprite->size.h +
+  //                            size.h});
+  SDL_RenderCopy(get_game_renderer(game), get_sprite_texture(sprite), NULL,
+                 NULL);
+}
+
 // TODO(Xelian): Change to use an array of sprites
 void render_sprite_loop(Game *game, Sprite *sprite) {
   SDL_RenderClear(get_game_renderer(game));
-  SDL_RenderCopy(get_game_renderer(game), get_sprite_texture(sprite), NULL,
-                 NULL);
+  render_sprite(game, sprite, (Size){20, 20}, (SDL_Point){20, 20});
   SDL_RenderPresent(get_game_renderer(game));
 }

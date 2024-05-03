@@ -2,6 +2,7 @@
 #define _SPRITE_
 
 #include "../game.h"
+#include "../math/size.h"
 #include "../window/window.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_rect.h>
@@ -16,8 +17,9 @@ SDL_Rect get_sprite_size(Sprite *sprite);
 /*
  * Create a sprite from a path
  */
-Sprite *create_sprite(Window *window, const char *path, SDL_Point coordinate);
+Sprite *create_sprite(Window *window, const char *path);
 
+void render_sprite(Game *game, Sprite *sprite, Size size, SDL_Point coordinate);
 void render_sprite_loop(Game *game, Sprite *sprite);
 
 /*
