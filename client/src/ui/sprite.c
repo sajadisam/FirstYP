@@ -7,7 +7,6 @@
 #include <SDL2/SDL_render.h>
 
 typedef struct {
-  // TODO(xelian): Change later to Size
   SDL_Rect size;
   SDL_Texture *texture;
 } Sprite;
@@ -33,7 +32,7 @@ Sprite *create_sprite(Window *window, const char *path) {
   Sprite *sprite = malloc(sizeof(Sprite));
   sprite->texture = texture;
   sprite->size.w = width;
-  sprite->size.h = width;
+  sprite->size.h = height;
   sprite->size.x = 0;
   sprite->size.y = 0;
   return sprite;
