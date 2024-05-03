@@ -10,7 +10,7 @@ typedef struct netPlayer NetPlayer;
 /*
  * Create a networkable player
  */
-NetPlayer *create_net_player();
+NetPlayer *create_net_player(struct SpriteSheet *sprite);
 
 /*
  * Destroy our networkable player

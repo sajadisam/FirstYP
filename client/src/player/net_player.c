@@ -1,3 +1,4 @@
+#include "../ui/spritesheet.h"
 #include "player.h"
 #include <SDL2/SDL_net.h>
 #include <stdlib.h>
@@ -8,9 +9,9 @@ typedef struct {
   Player *player;
 } NetPlayer;
 
-NetPlayer *create_net_player() {
+NetPlayer *create_net_player(SpriteSheet *sprite) {
   NetPlayer *player = malloc(sizeof(NetPlayer));
-  player->player = create_player();
+  player->player = create_player((void *)sprite);
   return player;
 }
 
