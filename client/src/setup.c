@@ -33,16 +33,16 @@ void run(Game *game) {
   Window *window = get_game_window(game);
   Player *player = get_game_player(game);
   Clock *clock = get_game_clock(game);
-  Timer *animation_speed = create_timer(clock, 85);
-  SpriteSheet *player_sprite = (SpriteSheet *)get_player_spritesheet(player);
+  Timer *animation_speed = create_timer(clock, 100);
+  SDL_Renderer *renderer = get_game_renderer(game);
   while (!window_event_loop(window, window_event_callback, game)) {
     update_clock(clock);
     perform_movement(player, animation_speed);
-    SDL_RenderClear(get_game_renderer(game));
+    SDL_RenderClear(renderer);
     render_sprite(game, get_game_map(game), (Size){0, 0}, (SDL_Point){0, 0});
-    render_spritesheet(game, player_sprite, (Size){24, 24},
-                       get_player_coordinates(player));
-    SDL_RenderPresent(get_game_renderer(game));
+    render_spritesheet(game, (SpriteSheet *)get_player_spritesheet(player),
+                       (Size){24, 24}, get_player_coordinates(player));
+    SDL_RenderPresent(renderer);
   }
 }
 

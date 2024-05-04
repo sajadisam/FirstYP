@@ -11,7 +11,7 @@ typedef struct {
   SDL_Point coordinate;
   SpriteSheet *sprite;
   PlayerFlag flags;
-  int speed;
+  float speed;
 } Player;
 
 Player *create_player(SpriteSheet *sprite) {
@@ -20,7 +20,7 @@ Player *create_player(SpriteSheet *sprite) {
   player->coordinate.y = 0;
   player->sprite = sprite;
   player->flags = IDLE;
-  player->speed = 2;
+  player->speed = 1.75f;
   return player;
 }
 
