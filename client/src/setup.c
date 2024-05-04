@@ -10,7 +10,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_net.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 void initalize_sdl() {
@@ -27,7 +26,6 @@ Game *initialize() {
   Sprite *mapSprite = create_sprite(window, "./resources/new_map.png");
   Clock *clock = create_clock();
   Game *game = create_game(window, player, (void *)mapSprite, clock);
-  DEBUG("playerflag: %d\n", (int)get_player_flags(player));
   return game;
 }
 
@@ -35,25 +33,15 @@ void run(Game *game) {
   Window *window = get_game_window(game);
   Player *player = get_game_player(game);
   Clock *clock = get_game_clock(game);
-  Timer *second = create_timer(clock, 1000);
+  Timer *animation_speed = create_timer(clock, 85);
+  SpriteSheet *player_sprite = (SpriteSheet *)get_player_spritesheet(player);
   while (!window_event_loop(window, window_event_callback, game)) {
     update_clock(clock);
-    PlayerFlag flags = get_player_flags(player);
-    if (flags & MOVINGUP)
-      player_move_up(player);
-    if (flags & MOVINGDOWN)
-      player_move_down(player);
-    if (flags & MOVINGRIGHT)
-      player_move_right(player);
-    if (flags & MOVINGLEFT)
-      player_move_left(player);
-
-    if (timer_finished(second))
-      printf("deltatime: %d\n", get_clock_deltatime(clock));
+    perform_movement(player, animation_speed);
     SDL_RenderClear(get_game_renderer(game));
     render_sprite(game, get_game_map(game), (Size){0, 0}, (SDL_Point){0, 0});
-    render_spritesheet(game, (SpriteSheet *)get_player_spritesheet(player),
-                       (Size){20, 20}, get_player_coordinates(player));
+    render_spritesheet(game, player_sprite, (Size){24, 24},
+                       get_player_coordinates(player));
     SDL_RenderPresent(get_game_renderer(game));
   }
 }

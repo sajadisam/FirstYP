@@ -1,6 +1,7 @@
 #ifndef _PLAYER_
 #define _PLAYER_
 
+#include "../clock.h"
 #include "player_flags.h"
 #include <SDL2/SDL_rect.h>
 
@@ -18,6 +19,8 @@ Player *create_player(struct SpriteSheet *sprite);
  * Destroy a player
  */
 void destroy_player(Player *player);
+
+void perform_movement(Player *player, Timer *animation_speed);
 
 struct SpriteSheet *get_player_spritesheet(const Player *player);
 

@@ -1,3 +1,4 @@
+#include "../clock.h"
 #include "../ui/spritesheet.h"
 #include "player_flags.h"
 #include <SDL2/SDL.h>
@@ -29,7 +30,43 @@ void destroy_player(Player *player) {
   }
 }
 
+void player_move_down(Player *player) { player->coordinate.y += player->speed; }
+void player_move_up(Player *player) { player->coordinate.y -= player->speed; }
+void player_move_right(Player *player) {
+  player->coordinate.x += player->speed;
+}
+void player_move_left(Player *player) { player->coordinate.x -= player->speed; }
+
+void perform_movement(Player *player, Timer *animation_speed) {
+  SpriteSheet *player_sprite = player->sprite;
+  int current = get_current_frame(player_sprite);
+  int hFrames = get_spritesheet_h_frames(player->sprite);
+  int vFrames = get_spritesheet_v_frames(player->sprite);
+  if (player->flags & MOVINGDOWN) {
+    if (timer_finished(animation_speed))
+      set_current_frame(player_sprite, (current + 1) % hFrames);
+    player_move_down(player);
+  }
+  if (player->flags & MOVINGUP) {
+    if (timer_finished(animation_speed))
+      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 1);
+    player_move_up(player);
+  }
+  if (player->flags & MOVINGRIGHT) {
+    if (timer_finished(animation_speed))
+      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 2);
+    player_move_right(player);
+  }
+
+  if (player->flags & MOVINGLEFT) {
+    if (timer_finished(animation_speed))
+      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 3);
+    player_move_left(player);
+  }
+}
+
 SpriteSheet *get_player_spritesheet(Player *player) { return player->sprite; }
+
 PlayerFlag get_player_flags(Player *player) { return player->flags; }
 void set_player_flags(Player *player, PlayerFlag flags) {
   player->flags = flags;
@@ -39,10 +76,3 @@ SDL_Point get_player_coordinates(Player *player) { return player->coordinate; }
 void set_player_coordinates(Player *player, SDL_Point coordinate) {
   player->coordinate = coordinate;
 }
-
-void player_move_down(Player *player) { player->coordinate.y += player->speed; }
-void player_move_up(Player *player) { player->coordinate.y -= player->speed; }
-void player_move_right(Player *player) {
-  player->coordinate.x += player->speed;
-}
-void player_move_left(Player *player) { player->coordinate.x -= player->speed; }

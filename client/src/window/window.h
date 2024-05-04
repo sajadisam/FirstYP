@@ -21,7 +21,7 @@ void window_destroy(Window *window);
  *  @arg arg: additional argument to be passed to the callback
  *  @return the value
  */
-void *window_event_loop(Window *window, const EventLoopCallback callback,
+void *window_event_loop(const Window *window, const EventLoopCallback callback,
                         void *arg);
 
 SDL_Renderer *get_window_renderer(const Window *window);

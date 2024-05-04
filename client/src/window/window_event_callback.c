@@ -14,26 +14,28 @@ void *window_event_callback(const SDL_Event *event, void *arg) {
   Player *player = get_game_player(game);
   PlayerFlag flags = get_player_flags(player);
   switch (event->type) {
-  case SDL_KEYDOWN:
-    if (event->key.keysym.scancode == SDL_SCANCODE_UP)
+  case SDL_KEYDOWN: {
+    SDL_Scancode code = event->key.keysym.scancode;
+    if (code == SDL_SCANCODE_UP || code == SDL_SCANCODE_W)
       flags |= MOVINGUP;
-    if (event->key.keysym.scancode == SDL_SCANCODE_DOWN)
+    if (code == SDL_SCANCODE_DOWN || code == SDL_SCANCODE_S)
       flags |= MOVINGDOWN;
-    if (event->key.keysym.scancode == SDL_SCANCODE_RIGHT)
+    if (code == SDL_SCANCODE_RIGHT || code == SDL_SCANCODE_D)
       flags |= MOVINGRIGHT;
-    if (event->key.keysym.scancode == SDL_SCANCODE_LEFT)
+    if (code == SDL_SCANCODE_LEFT || code == SDL_SCANCODE_A)
       flags |= MOVINGLEFT;
-    break;
-  case SDL_KEYUP:
-    if (event->key.keysym.scancode == SDL_SCANCODE_UP)
+  } break;
+  case SDL_KEYUP: {
+    SDL_Scancode code = event->key.keysym.scancode;
+    if (code == SDL_SCANCODE_UP || code == SDL_SCANCODE_W)
       flags &= ~MOVINGUP;
-    if (event->key.keysym.scancode == SDL_SCANCODE_DOWN)
+    if (code == SDL_SCANCODE_DOWN || code == SDL_SCANCODE_S)
       flags &= ~MOVINGDOWN;
-    if (event->key.keysym.scancode == SDL_SCANCODE_RIGHT)
+    if (code == SDL_SCANCODE_RIGHT || code == SDL_SCANCODE_D)
       flags &= ~MOVINGRIGHT;
-    if (event->key.keysym.scancode == SDL_SCANCODE_LEFT)
+    if (code == SDL_SCANCODE_LEFT || code == SDL_SCANCODE_A)
       flags &= ~MOVINGLEFT;
-    break;
+  } break;
   }
   set_player_flags(player, flags);
   return false;

@@ -37,6 +37,12 @@ void render_spritesheet(const Game *game, const SpriteSheet *sprite,
                              vertical + size.h});
 }
 
+int get_spritesheet_h_frames(const SpriteSheet *sprite) {
+  return sprite->hFrames;
+}
+int get_spritesheet_v_frames(const SpriteSheet *sprite) {
+  return sprite->vFrames;
+}
 int get_spritesheet_current_h_frame(const SpriteSheet *sprite) {
   return sprite->currentHFrame;
 }
@@ -49,6 +55,13 @@ void set_spritesheet_current_h_frame(SpriteSheet *sprite, const int frame) {
 void set_spritesheet_current_v_frame(SpriteSheet *sprite, const int frame) {
   sprite->currentVFrame = frame;
 }
+
 void set_current_frame(SpriteSheet *sprite, const int frame) {
-  sprite->currentHFrame = ceil(sprite->hFrames / frame);
+  const int limited = frame % (sprite->hFrames * sprite->vFrames);
+  sprite->currentHFrame = limited % sprite->hFrames;
+  sprite->currentVFrame = ceil(limited / sprite->vFrames);
+}
+
+int get_current_frame(SpriteSheet *sprite) {
+  return sprite->currentHFrame + (sprite->currentVFrame * sprite->hFrames);
 }

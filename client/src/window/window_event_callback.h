@@ -6,6 +6,6 @@
 /*
  * A callback that gets triggered based on window event
  */
-void *window_event_callback(SDL_Event *event, void *arg);
+void *window_event_callback(const SDL_Event *event, void *arg);
 
 #endif // !_WINDOW_EVENT_CALLBACK
