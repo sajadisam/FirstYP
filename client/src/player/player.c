@@ -3,6 +3,7 @@
 #include "player_flags.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_rect.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,28 +40,27 @@ void player_move_left(Player *player) { player->coordinate.x -= player->speed; }
 
 void perform_movement(Player *player, Timer *animation_speed) {
   SpriteSheet *player_sprite = player->sprite;
-  int current = get_current_frame(player_sprite);
   int hFrames = get_spritesheet_h_frames(player->sprite);
-  int vFrames = get_spritesheet_v_frames(player->sprite);
+  bool clocked = timer_finished(animation_speed);
+  int nextH = (get_spritesheet_current_h_frame(player_sprite) + 1) % hFrames;
   if (player->flags & MOVINGDOWN) {
-    if (timer_finished(animation_speed))
-      set_current_frame(player_sprite, (current + 1) % hFrames);
+    if (clocked)
+      set_spritesheet_current_h_v_frame(player_sprite, nextH, 0);
     player_move_down(player);
   }
   if (player->flags & MOVINGUP) {
-    if (timer_finished(animation_speed))
-      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 1);
+    if (clocked)
+      set_spritesheet_current_h_v_frame(player_sprite, nextH, 1);
     player_move_up(player);
   }
   if (player->flags & MOVINGRIGHT) {
-    if (timer_finished(animation_speed))
-      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 2);
+    if (clocked)
+      set_spritesheet_current_h_v_frame(player_sprite, nextH, 2);
     player_move_right(player);
   }
-
   if (player->flags & MOVINGLEFT) {
-    if (timer_finished(animation_speed))
-      set_current_frame(player_sprite, ((current + 1) % hFrames) + vFrames * 3);
+    if (clocked)
+      set_spritesheet_current_h_v_frame(player_sprite, nextH, 3);
     player_move_left(player);
   }
 }

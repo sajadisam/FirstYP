@@ -52,14 +52,13 @@ int get_spritesheet_current_v_frame(const SpriteSheet *sprite) {
 void set_spritesheet_current_h_frame(SpriteSheet *sprite, const int frame) {
   sprite->currentHFrame = frame;
 }
+void set_spritesheet_current_h_v_frame(SpriteSheet *sprite, const int h,
+                                       const int v) {
+  sprite->currentHFrame = h;
+  sprite->currentVFrame = v;
+}
 void set_spritesheet_current_v_frame(SpriteSheet *sprite, const int frame) {
   sprite->currentVFrame = frame;
-}
-
-void set_current_frame(SpriteSheet *sprite, const int frame) {
-  const int limited = frame % (sprite->hFrames * sprite->vFrames);
-  sprite->currentHFrame = limited % sprite->hFrames;
-  sprite->currentVFrame = ceil(limited / sprite->vFrames);
 }
 
 int get_current_frame(SpriteSheet *sprite) {
