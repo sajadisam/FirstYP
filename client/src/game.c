@@ -5,12 +5,18 @@
 #include "window/window.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+  const char *id;
+  Sprite *sprite;
+} GameSprite;
 
 typedef struct {
   Window *window;
   Player *player;
   Clock *clock;
-  Sprite **sprites;
+  GameSprite *sprites;
   int sprites_len;
 } Game;
 
@@ -24,15 +30,22 @@ Game *create_game(Window *window, Player *player, Clock *clock) {
   return game;
 }
 
-Sprite *add_game_sprite(Game *game, Sprite *sprite) {
-  game->sprites =
-      realloc(game->sprites, sizeof(Sprite *) * (game->sprites_len + 1));
-  game->sprites[game->sprites_len++] = sprite;
-  return sprite;
+Sprite *find_game_sprite(Game *game, const char *id) {
+  for (int i = 0; i < game->sprites_len; i++) {
+    GameSprite *sprite = game->sprites + i;
+    if (strcmp(sprite->id, id) == 0)
+      return sprite->sprite;
+  }
+  return NULL;
 }
 
-Sprite *create_game_sprite(Game *game, const char *path) {
-  return add_game_sprite(game, create_sprite(game->window, path));
+Sprite *add_game_sprite(Game *game, Sprite *sprite, const char *id) {
+  game->sprites =
+      realloc(game->sprites, sizeof(GameSprite) * (game->sprites_len + 1));
+  game->sprites[game->sprites_len].id = id;
+  game->sprites[game->sprites_len].sprite = sprite;
+  game->sprites_len++;
+  return sprite;
 }
 
 void render_game_sprites(Game *game) {
@@ -40,7 +53,7 @@ void render_game_sprites(Game *game) {
   SDL_RenderClear(renderer);
   for (int i = 0; i < game->sprites_len; i++) {
 
-    Sprite *sprite = game->sprites[i];
+    Sprite *sprite = game->sprites[i].sprite;
     SDL_Texture *texture = get_sprite_texture(sprite);
     SpriteRenderOptions options = get_sprite_render_options(sprite);
     SDL_Rect spriteSize = get_sprite_size(sprite);

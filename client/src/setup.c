@@ -29,8 +29,8 @@ Game *initialize() {
   Clock *clock = create_clock();
   Game *game = create_game(window, player, clock);
   set_sprite_render_size(mapSprite, (Size){WINDOW_WIDTH, WINDOW_HEIGHT});
-  add_game_sprite(game, (void *)mapSprite);
-  add_game_sprite(game, get_spritesheet_sprite(playerSprite));
+  add_game_sprite(game, (void *)mapSprite, "map");
+  add_game_sprite(game, get_spritesheet_sprite(playerSprite), "player");
   return game;
 }
 

@@ -14,14 +14,16 @@ enum GameState {
 
 // Struct that defines our overall game data
 typedef struct game Game;
+typedef struct gameSprite GameSprite;
 
 /*
  * Create an instance of our game
  */
 Game *create_game(Window *window, Player *player, Clock *clock);
 
-struct Sprite *create_game_sprite(Game *game, const char *path);
-struct Sprite *add_game_sprite(Game *game, struct Sprite *sprite);
+struct Sprite *find_game_sprite(Game *game, const char *id);
+struct Sprite *add_game_sprite(Game *game, struct Sprite *sprite,
+                               const char *id);
 
 void render_game_sprites(Game *game);
 SDL_Renderer *get_game_renderer(const Game *game);
