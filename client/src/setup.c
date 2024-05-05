@@ -24,7 +24,6 @@ Game *initialize() {
   SpriteSheet *playerSprite =
       create_spritesheet(window, "./resources/player.png", 4, 4);
   Sprite *mapSprite = create_sprite(window, "./resources/new_map.png");
-
   Player *player = create_player((void *)playerSprite);
   set_player_coordinates(player,
                          (SDL_Point){WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2});
