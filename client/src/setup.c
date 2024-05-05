@@ -21,11 +21,16 @@ void initalize_sdl() {
 
 Game *initialize() {
   Window *window = window_create("Zombie hunter", WINDOW_WIDTH, WINDOW_HEIGHT);
-  Player *player = create_player(
-      (void *)create_spritesheet(window, "./resources/player.png", 4, 4));
+  SpriteSheet *playerSprite =
+      create_spritesheet(window, "./resources/player.png", 4, 4);
   Sprite *mapSprite = create_sprite(window, "./resources/new_map.png");
+
+  Player *player = create_player((void *)playerSprite);
   Clock *clock = create_clock();
-  Game *game = create_game(window, player, (void *)mapSprite, clock);
+  Game *game = create_game(window, player, clock);
+  set_sprite_render_size(mapSprite, (Size){WINDOW_WIDTH, WINDOW_HEIGHT});
+  add_game_sprite(game, (void *)mapSprite);
+  add_game_sprite(game, get_spritesheet_sprite(playerSprite));
   return game;
 }
 
@@ -34,15 +39,10 @@ void run(Game *game) {
   Player *player = get_game_player(game);
   Clock *clock = get_game_clock(game);
   Timer *animation_speed = create_timer(clock, 100);
-  SDL_Renderer *renderer = get_game_renderer(game);
   while (!window_event_loop(window, window_event_callback, game)) {
     update_clock(clock);
     perform_movement(player, animation_speed);
-    SDL_RenderClear(renderer);
-    render_sprite(game, get_game_map(game), (Size){0, 0}, (SDL_Point){0, 0});
-    render_spritesheet(game, (SpriteSheet *)get_player_spritesheet(player),
-                       (Size){24, 24}, get_player_coordinates(player));
-    SDL_RenderPresent(renderer);
+    render_game_sprites(game);
   }
 }
 

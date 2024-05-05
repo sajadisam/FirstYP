@@ -22,21 +22,24 @@ SpriteSheet *create_spritesheet(const Window *window, const char *path,
   sprite->currentVFrame = 0;
   return sprite;
 }
-void render_spritesheet(const Game *game, const SpriteSheet *sprite,
-                        const Size size, const SDL_Point coordinate) {
+void set_spritesheet_render_options(SpriteSheet *sprite, const Size size,
+                                    const SDL_Point coordinate) {
   SDL_Rect spriteSize = get_sprite_size(sprite->sprite);
   SDL_Texture *texture = get_sprite_texture(sprite->sprite);
-  SDL_Renderer *renderer = get_game_renderer(game);
   int horizontal = spriteSize.w / sprite->hFrames;
   int vertical = spriteSize.h / sprite->vFrames;
-  SDL_RenderCopy(renderer, texture,
-                 &(SDL_Rect){horizontal * sprite->currentHFrame,
-                             vertical * sprite->currentVFrame, horizontal,
-                             vertical},
-                 &(SDL_Rect){coordinate.x, coordinate.y, horizontal + size.w,
-                             vertical + size.h});
+
+  set_sprite_render_coordinate(sprite->sprite, coordinate);
+  set_sprite_render_clip(sprite->sprite,
+                         (Size){horizontal * sprite->currentHFrame,
+                                vertical * sprite->currentVFrame});
+  set_sprite_render_size(sprite->sprite, size);
+  set_sprite_render_crop(sprite->sprite, (SDL_Point){horizontal, vertical});
 }
 
+Sprite *get_spritesheet_sprite(const SpriteSheet *sprite) {
+  return sprite->sprite;
+}
 int get_spritesheet_h_frames(const SpriteSheet *sprite) {
   return sprite->hFrames;
 }

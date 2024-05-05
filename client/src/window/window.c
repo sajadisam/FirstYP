@@ -19,7 +19,7 @@ Window *window_create(const char *name, const int width, const int height) {
 
   SDL_Window *pWindow =
       SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                       width, height, SDL_WINDOW_RESIZABLE);
+                       width, height, NULL);
 
   if (!pWindow)
     on_sdl_error();

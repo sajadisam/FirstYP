@@ -18,9 +18,12 @@ typedef struct game Game;
 /*
  * Create an instance of our game
  */
-Game *create_game(Window *window, Player *player, struct Sprite *map,
-                  Clock *clock);
+Game *create_game(Window *window, Player *player, Clock *clock);
 
+struct Sprite *create_game_sprite(Game *game, const char *path);
+struct Sprite *add_game_sprite(Game *game, struct Sprite *sprite);
+
+void render_game_sprites(Game *game);
 SDL_Renderer *get_game_renderer(const Game *game);
 Window *get_game_window(const Game *game);
 Player *get_game_player(const Game *game);

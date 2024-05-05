@@ -1,7 +1,7 @@
-#include "../game.h"
 #include "../math/size.h"
 #include "../shared/misc.h"
 #include "../window/window.h"
+#include "sprite_render_options.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
@@ -9,6 +9,7 @@
 typedef struct {
   SDL_Rect size;
   SDL_Texture *texture;
+  SpriteRenderOptions render;
 } Sprite;
 
 Sprite *create_sprite(const Window *window, const char *path) {
@@ -31,6 +32,10 @@ Sprite *create_sprite(const Window *window, const char *path) {
   sprite->size.h = height;
   sprite->size.x = 0;
   sprite->size.y = 0;
+  sprite->render = (SpriteRenderOptions){.coordinate = (SDL_Point){0, 0},
+                                         .size = (Size){width, height},
+                                         .clip = (Size){0, 0},
+                                         .crop = (SDL_Point){-1, -1}};
   return sprite;
 }
 
@@ -42,18 +47,21 @@ void destroy_sprite(Sprite *sprite) {
   }
 }
 
-void render_sprite(Game *game, const Sprite *sprite, Size size,
-                   SDL_Point coordinate) {
-  SDL_RenderCopy(get_game_renderer(game), sprite->texture, NULL, NULL);
+void set_sprite_render_crop(Sprite *sprite, SDL_Point crop) {
+  sprite->render.crop = crop;
+}
+void set_sprite_render_clip(Sprite *sprite, Size clip) {
+  sprite->render.clip = clip;
+}
+void set_sprite_render_coordinate(Sprite *sprite, SDL_Point coordinate) {
+  sprite->render.coordinate = coordinate;
+}
+void set_sprite_render_size(Sprite *sprite, Size size) {
+  sprite->render.size = size;
 }
 
-// TODO(Xelian): Change to use an array of sprites
-void render_sprite_loop(Game *game, Sprite *sprite) {
-  SDL_RenderClear(get_game_renderer(game));
-  render_sprite(game, sprite, (Size){20, 20}, (SDL_Point){20, 20});
-  SDL_RenderPresent(get_game_renderer(game));
+SpriteRenderOptions get_sprite_render_options(Sprite *sprite) {
+  return sprite->render;
 }
-
-/* GETTERS & SETTERS */
 SDL_Texture *get_sprite_texture(Sprite *sprite) { return sprite->texture; }
 SDL_Rect get_sprite_size(Sprite *sprite) { return sprite->size; }

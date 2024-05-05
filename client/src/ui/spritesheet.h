@@ -15,17 +15,18 @@ SpriteSheet *create_spritesheet(const Window *window, const char *path,
                                 const int hFrames, const int vFrames);
 
 /*
- * Renders the sprite from the sprite sheet based on the current frame set by
- * set_current_frame()
+ * Sets the render options of the spritesheet, similar to sprite spreadsheet but
+ * with extra functionality. Also depends on set_current_frame()
  */
-void render_spritesheet(const Game *game, const SpriteSheet *sprite,
-                        const Size size, const SDL_Point coordinate);
+void set_spritesheet_render_options(SpriteSheet *sprite, const Size size,
+                                    const SDL_Point coordinate);
 
 /*
  * Gets the clockwise index of the spridesheet
  */
 int get_current_frame(SpriteSheet *sprite);
 
+struct Sprite *get_spritesheet_sprite(const SpriteSheet *sprite);
 int get_spritesheet_h_frames(const SpriteSheet *sprite);
 int get_spritesheet_v_frames(const SpriteSheet *sprite);
 void set_spritesheet_current_h_v_frame(SpriteSheet *sprite, const int h,

@@ -63,6 +63,8 @@ void perform_movement(Player *player, Timer *animation_speed) {
       set_spritesheet_current_h_v_frame(player_sprite, nextH, 3);
     player_move_left(player);
   }
+  set_spritesheet_render_options(player_sprite, (Size){50, 50},
+                                 player->coordinate);
 }
 
 SpriteSheet *get_player_spritesheet(Player *player) { return player->sprite; }
