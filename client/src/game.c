@@ -1,5 +1,6 @@
 #include "clock.h"
 #include "player/player.h"
+#include "shared/config.h"
 #include "shared/debug.h"
 #include "ui/sprite.h"
 #include "window/window.h"
@@ -51,6 +52,8 @@ Sprite *add_game_sprite(Game *game, Sprite *sprite, const char *id) {
 void render_game_sprites(Game *game) {
   SDL_Renderer *renderer = get_window_renderer(game->window);
   SDL_RenderClear(renderer);
+  SDL_Point mouse = get_window_mouse_coordinate(game->window);
+  SDL_Point player = get_player_coordinates(game->player);
   for (int i = 0; i < game->sprites_len; i++) {
 
     Sprite *sprite = game->sprites[i].sprite;
@@ -59,11 +62,12 @@ void render_game_sprites(Game *game) {
     SDL_Rect spriteSize = get_sprite_size(sprite);
     int cropW = options.crop.x != -1 ? options.crop.x : spriteSize.w;
     int cropH = options.crop.y != -1 ? options.crop.y : spriteSize.h;
-
-    SDL_RenderCopy(renderer, texture,
-                   &(SDL_Rect){options.clip.w, options.clip.h, cropW, cropH},
-                   &(SDL_Rect){options.coordinate.x, options.coordinate.y,
-                               options.size.w, options.size.h});
+    SDL_RenderCopy(
+        renderer, texture,
+        &(SDL_Rect){options.clip.w, options.clip.h, cropW, cropH},
+        &(SDL_Rect){options.coordinate.x - (player.x) + WINDOW_WIDTH / 2,
+                    options.coordinate.y - (player.y) + WINDOW_HEIGHT / 2,
+                    options.size.w, options.size.h});
   }
   SDL_RenderPresent(renderer);
 }

@@ -26,6 +26,8 @@ Game *initialize() {
   Sprite *mapSprite = create_sprite(window, "./resources/new_map.png");
 
   Player *player = create_player((void *)playerSprite);
+  set_player_coordinates(player,
+                         (SDL_Point){WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2});
   Clock *clock = create_clock();
   Game *game = create_game(window, player, clock);
   set_sprite_render_size(mapSprite, (Size){WINDOW_WIDTH, WINDOW_HEIGHT});
