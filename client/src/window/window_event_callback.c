@@ -1,6 +1,6 @@
 #include "../game.h"
-#include "../shared/debug.h"
 #include "../ui/spritesheet.h"
+#include "window.h"
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
@@ -14,6 +14,10 @@ void *window_event_callback(const SDL_Event *event, void *arg) {
   Player *player = get_game_player(game);
   PlayerFlag flags = get_player_flags(player);
   switch (event->type) {
+  case SDL_MOUSEMOTION:
+    set_window_mouse_coordinate(get_game_window(game),
+                                (SDL_Point){event->motion.x, event->motion.y});
+    break;
   case SDL_KEYDOWN: {
     SDL_Scancode code = event->key.keysym.scancode;
     if (code == SDL_SCANCODE_UP || code == SDL_SCANCODE_W)

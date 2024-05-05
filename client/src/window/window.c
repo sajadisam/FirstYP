@@ -10,6 +10,7 @@
 typedef struct {
   SDL_Window *m_Window;
   SDL_Renderer *m_Renderer;
+  SDL_Point mouse_coordinate;
 } Window;
 
 typedef void *(*EventLoopCallback)(const SDL_Event *event, void *);
@@ -35,6 +36,7 @@ Window *window_create(const char *name, const int width, const int height) {
   Window *window = malloc(sizeof(Window));
   window->m_Window = pWindow;
   window->m_Renderer = pRenderer;
+  window->mouse_coordinate = (SDL_Point){-1, -1};
   return window;
 }
 
@@ -57,6 +59,14 @@ void *window_event_loop(const Window *window, const EventLoopCallback callback,
     }
   }
   return NULL;
+}
+
+void set_window_mouse_coordinate(Window *window, SDL_Point coordinate) {
+  window->mouse_coordinate = coordinate;
+}
+
+SDL_Point get_window_mouse_coordinate(Window *window) {
+  return window->mouse_coordinate;
 }
 
 SDL_Renderer *get_window_renderer(const Window *window) {

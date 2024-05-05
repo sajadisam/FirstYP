@@ -24,6 +24,8 @@ void window_destroy(Window *window);
 void *window_event_loop(const Window *window, const EventLoopCallback callback,
                         void *arg);
 
+void set_window_mouse_coordinate(Window *window, SDL_Point coordinate);
+SDL_Point get_window_mouse_coordinate(Window *window);
 SDL_Renderer *get_window_renderer(const Window *window);
 SDL_Window *get_window_sdlwindow(const Window *window);
 
