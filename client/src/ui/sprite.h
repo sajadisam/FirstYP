@@ -1,37 +1,17 @@
-#ifndef _SPRITE_
-#define _SPRITE_
+#ifndef SPRITE_H
+#define SPRITE_H
 
-#include "../math/size.h"
-#include "../window/window.h"
-#include "sprite_render_options.h"
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_rect.h>
 #include <SDL2/SDL_render.h>
 
-typedef struct sprite Sprite;
+typedef struct Sprite Sprite;
 
-/*
- * Create a sprite from a path. Use set_sprite_render_options() to prepare for
- * rendering
- */
-Sprite *create_sprite(const Window *window, const char *path);
+Sprite *sprite_create(SDL_Renderer *renderer, char const *path);
+void sprite_destroy(Sprite *sprite);
 
-/*
- * Destroy a created sprite
- */
-void destroy_sprite(Sprite *sprite);
+void sprite_draw(SDL_Renderer *renderer, Sprite *sprite, SDL_Rect *src,
+                 SDL_Rect *dst);
 
-/*
- * Sets the render options of the sprite
- */
+int sprite_get_width(Sprite *sprite);
+int sprite_get_height(Sprite *sprite);
 
-SDL_Texture *get_sprite_texture(Sprite *sprite);
-SpriteRenderOptions get_sprite_render_options(Sprite *sprite);
-SDL_Rect get_sprite_size(Sprite *sprite);
-
-void set_sprite_render_crop(Sprite *sprite, SDL_Point crop);
-void set_sprite_render_clip(Sprite *sprite, Size clip);
-void set_sprite_render_coordinate(Sprite *sprite, SDL_Point coordinate);
-void set_sprite_render_size(Sprite *sprite, Size size);
-
-#endif
+#endif // SPRITE_H
