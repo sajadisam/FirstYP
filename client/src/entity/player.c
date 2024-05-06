@@ -16,6 +16,7 @@ typedef struct {
 Player *player_create() {
   Player *player = malloc(sizeof(Player));
   player->entity = entity_create();
+  entity_move_coord(player->entity, 1500, 1500);
   player->flags = PLAYER_FLAG_NONE;
   player->speed = 2.0f * 60.0f;
   player->move_animation = animation_create(0.075f, 4);
