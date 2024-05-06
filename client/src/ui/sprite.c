@@ -8,7 +8,7 @@ typedef struct {
   SDL_Rect size;
 } Sprite;
 
-Sprite *sprite_create(SDL_Renderer *renderer, char const *path) {
+Sprite *sprite_create(SDL_Renderer *renderer, const char *path) {
   SDL_Surface *surface = IMG_Load(path);
   assert(surface);
   SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);

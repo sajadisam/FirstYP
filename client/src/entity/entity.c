@@ -13,7 +13,7 @@ Entity *entity_create() {
 
 void entity_destroy(Entity *entity) { free(entity); }
 
-SDL_Point entity_get_coord(Entity const *entity) { return entity->coordinate; }
+SDL_Point entity_get_coord(const Entity *entity) { return entity->coordinate; }
 
 void entity_set_coord(Entity *entity, SDL_Point point) {
   entity->coordinate = point;

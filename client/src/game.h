@@ -1,9 +1,9 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <SDL2/SDL_render.h>
 #include "entity/player.h"
 #include "window/window.h"
+#include <SDL2/SDL_render.h>
 
 typedef struct Game Game;
 
@@ -32,7 +32,7 @@ void game_render(Game *game);
 /// @brief Get the window from the game
 /// @param game The game to get the window
 /// @return The window from the game
-Window *get_game_window(Game const *game);
+Window *get_game_window(const Game *game);
 
 /// @brief Get the player from the game
 /// @param game The game to get the player
