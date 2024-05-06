@@ -1,39 +1,18 @@
-#ifndef _SPRITESHEET_
-#define _SPRITESHEET_
+#ifndef SPRITESHEET_H
+#define SPRITESHEET_H
 
-#include "../math/size.h"
-#include "../window/window.h"
+#include <SDL2/SDL_render.h>
 
-// Composes a sprite to be animatable
-typedef struct spriteSheet SpriteSheet;
-typedef struct game Game;
+typedef struct SpriteSheet SpriteSheet;
 
-/*
- * Create an spritesheet based on vertical and horizontal frames
- */
-SpriteSheet *create_spritesheet(const Window *window, const char *path,
-                                const int hFrames, const int vFrames);
+SpriteSheet *spritesheet_create(SDL_Renderer *renderer, const char *path,
+                                int cellWidth, int cellHeight);
+void spritesheet_destroy(SpriteSheet *sheet);
 
-/*
- * Sets the render options of the spritesheet, similar to sprite spreadsheet but
- * with extra functionality. Also depends on set_current_frame()
- */
-void set_spritesheet_render_options(SpriteSheet *sprite, const Size size,
-                                    const SDL_Point coordinate);
+void spritesheet_draw(SDL_Renderer *renderer, SpriteSheet *sheet, int cellX,
+                      int cellY, SDL_Rect *dst);
 
-/*
- * Gets the clockwise index of the spridesheet
- */
-int get_current_frame(SpriteSheet *sprite);
+int spritesheet_get_width(SpriteSheet *sheet);
+int spritesheet_get_height(SpriteSheet *sheet);
 
-struct Sprite *get_spritesheet_sprite(const SpriteSheet *sprite);
-int get_spritesheet_h_frames(const SpriteSheet *sprite);
-int get_spritesheet_v_frames(const SpriteSheet *sprite);
-void set_spritesheet_current_h_v_frame(SpriteSheet *sprite, const int h,
-                                       const int v);
-int get_spritesheet_current_h_frame(const SpriteSheet *sprite);
-int get_spritesheet_current_v_frame(const SpriteSheet *sprite);
-void set_spritesheet_current_h_frame(SpriteSheet *sprite, const int frame);
-void set_spritesheet_current_v_frame(SpriteSheet *sprite, const int frame);
-
-#endif // !_SPRITESHEET_
+#endif // SPRITESHEET_H
