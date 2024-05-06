@@ -1,32 +1,24 @@
-#ifndef _WINDOW_
-#define _WINDOW_
+#ifndef WINDOW_H
+#define WINDOW_H
 
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_render.h>
 
 typedef struct window Window;
-typedef void *(*EventLoopCallback)(const SDL_Event *event, void *);
+typedef int (*EventLoopCallback)(const SDL_Event *event, void *);
 
-/*
- * Creates a window
- */
 Window *window_create(const char *name, const int width, const int height);
 void window_destroy(Window *window);
 
-/*
- *  Handles a single window event by passing it to the callback
- *
- *  @arg window: Window to listen on the events
- *  @arg callback: callback to send the events to
- *  @arg arg: additional argument to be passed to the callback
- *  @return the value
- */
-void *window_event_loop(const Window *window, const EventLoopCallback callback,
-                        void *arg);
+int window_event_loop(const Window *window, EventLoopCallback callback,
+                      void *arg);
 
 void set_window_mouse_coordinate(Window *window, SDL_Point coordinate);
 SDL_Point get_window_mouse_coordinate(Window *window);
 SDL_Renderer *get_window_renderer(const Window *window);
 SDL_Window *get_window_sdlwindow(const Window *window);
 
-#endif // !_WINDOW_
+int window_get_width(Window const *window);
+int window_get_height(Window const *window);
+
+#endif // WINDOW_H

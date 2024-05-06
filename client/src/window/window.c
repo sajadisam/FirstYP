@@ -1,5 +1,4 @@
-#include "../shared/debug.h"
-#include "../shared/misc.h"
+#include "../debug.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
@@ -13,11 +12,14 @@ typedef struct {
   SDL_Point mouse_coordinate;
 } Window;
 
-typedef void *(*EventLoopCallback)(const SDL_Event *event, void *);
+typedef int (*EventLoopCallback)(const SDL_Event *event, void *);
 
+void on_sdl_error() {
+  ERR("%s\n", SDL_GetError());
+  SDL_Quit();
+  exit(5);
+}
 Window *window_create(const char *name, const int width, const int height) {
-  DEBUG("Creating a window\n");
-
   SDL_Window *pWindow =
       SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                        width, height, NULL);
@@ -49,16 +51,16 @@ void window_destroy(Window *window) {
   }
 }
 
-void *window_event_loop(const Window *window, const EventLoopCallback callback,
-                        void *arg) {
+int window_event_loop(const Window *window, const EventLoopCallback callback,
+                      void *arg) {
   SDL_Event event;
   while (SDL_PollEvent(&event) > 0) {
-    void *callbackResult = callback(&event, arg);
+    int callbackResult = (int)callback(&event, arg);
     if (callbackResult) {
       return callbackResult;
     }
   }
-  return NULL;
+  return 0;
 }
 
 void set_window_mouse_coordinate(Window *window, SDL_Point coordinate) {
@@ -74,4 +76,16 @@ SDL_Renderer *get_window_renderer(const Window *window) {
 }
 SDL_Window *get_window_sdlwindow(const Window *window) {
   return window->m_Window;
+}
+
+int window_get_width(Window const *window) {
+  int width, height;
+  SDL_GetWindowSize(window->m_Window, &width, &height);
+  return width;
+}
+
+int window_get_height(Window const *window) {
+  int width, height;
+  SDL_GetWindowSize(window->m_Window, &width, &height);
+  return height;
 }
