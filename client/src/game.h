@@ -1,35 +1,42 @@
-#ifndef _GAME_
-#define _GAME_
+#ifndef GAME_H
+#define GAME_H
 
-#include "clock.h"
-#include "player/player.h"
-#include "window/window.h"
 #include <SDL2/SDL_render.h>
+#include "entity/player.h"
+#include "window/window.h"
 
-enum GameState {
-  Paused,
-  Processing,
-  Exiting,
-};
+typedef struct Game Game;
 
-// Struct that defines our overall game data
-typedef struct game Game;
-typedef struct gameSprite GameSprite;
+/// @brief Create a game
+/// @param window The window to create the game
+/// @return The game created
+Game *game_create(Window *window);
 
-/*
- * Create an instance of our game
- */
-Game *create_game(Window *window, Player *player, Clock *clock);
+/// @brief Destroy a game
+/// @param game The game to destroy
+void game_destroy(Game *game);
 
-struct Sprite *find_game_sprite(Game *game, const char *id);
-struct Sprite *add_game_sprite(Game *game, struct Sprite *sprite,
-                               const char *id);
+/// @brief Run the game
+/// @param game The game to run
+void game_run(Game *game);
 
-void render_game_sprites(Game *game);
-SDL_Renderer *get_game_renderer(const Game *game);
-Window *get_game_window(const Game *game);
-Player *get_game_player(const Game *game);
-Clock *get_game_clock(const Game *game);
-struct Sprite *get_game_map(const Game *game);
+/// @brief Update the game
+/// @param game The game to update
+/// @param dt The delta time
+void game_update(Game *game, float dt);
 
-#endif // !_GAME_
+/// @brief Render the game
+/// @param game The game to render
+void game_render(Game *game);
+
+/// @brief Get the window from the game
+/// @param game The game to get the window
+/// @return The window from the game
+Window *get_game_window(Game const *game);
+
+/// @brief Get the player from the game
+/// @param game The game to get the player
+/// @return The player from the game
+Player *game_get_self_player(Game *game);
+
+#endif // GAME_H
