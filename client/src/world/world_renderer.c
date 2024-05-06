@@ -16,7 +16,7 @@ WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
   world_renderer->player_sprite_sheet =
       spritesheet_create(renderer, "assets/sprites/player.png", 17, 28);
   world_renderer->mob_sprite_sheet =
-      spritesheet_create(renderer, "assets/sprites/mob.png", 17, 28);
+      spritesheet_create(renderer, "assets/sprites/mob.png", 96 / 3, 128 / 4);
   return world_renderer;
 }
 
