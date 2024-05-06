@@ -75,11 +75,11 @@ Game *game_create(Window *window) {
   text_set_coordinate(text, (SDL_Point){10, 20});
   canvas_add_element(game->canvas, text_get_element(text));
 
-  // for (int i = 0; i < 50; i++) {
-  //   Mob *mob = mob_create();
-  //   world_add_mob(game->world, mob);
-  //   mob_set_coord(mob, (SDL_Point){(rand() % 32) * 32, (rand() % 32) * 32});
-  // }
+  for (int i = 0; i < 10; i++) {
+    Mob *mob = mob_create();
+    world_add_mob(game->world, mob);
+    mob_set_coord(mob, (SDL_Point){(rand() % 256) * 256, (rand() % 256) * 256});
+  }
   return game;
 }
 
