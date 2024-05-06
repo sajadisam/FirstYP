@@ -1,14 +1,17 @@
 #include "entity/mob.h"
 #include "entity/player.h"
+#include "ui/text.h"
 #include "window/window.h"
 #include "world/world.h"
 #include <SDL2/SDL_timer.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdlib.h>
 
 typedef struct {
   Window *window;
   World *world;
   int selfPlayerId;
+  Text *text;
 } Game;
 
 Player *game_get_self_player(Game *game) {
@@ -63,6 +66,9 @@ Game *game_create(Window *window) {
   Player *selfPlayer = player_create();
   game->selfPlayerId = world_add_player(game->world, selfPlayer);
   world_load_level(game->world, "default", "default");
+  TTF_Init();
+  game->text = text_create(get_window_renderer(window), "test text",
+                           "assets/fonts/sans.ttf", 15);
 
   for (int i = 0; i < 50; i++) {
     Mob *mob = mob_create();
@@ -89,6 +95,7 @@ void game_render(Game *game) {
   pivot.y -= window_get_height(game->window) / 2;
 
   world_render(game->world, pivot);
+  text_draw(game->text);
 
   SDL_RenderPresent(renderer);
 }
