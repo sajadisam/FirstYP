@@ -75,7 +75,7 @@ void level_load_tiles(char const *levelPath, int **pTiles, int *pWidth,
 
 Level *level_create(SDL_Renderer *renderer, const char *tilesetPath,
                     const char *levelPath) {
-  Tileset *tileset = tileset_create(renderer, tilesetPath, 32, 32);
+  Tileset *tileset = tileset_create(renderer, tilesetPath, 16, 16);
 
   int width, height;
   int *tiles;
