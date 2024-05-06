@@ -1,6 +1,7 @@
 #ifndef _UI_
 #define _UI_
 
+#include "element.h"
 #include <SDL2/SDL_render.h>
 
 typedef struct Text Text;
@@ -13,6 +14,7 @@ void text_draw(Text *text);
 void text_set_text(Text *text, const char *data);
 
 void text_set_size(Text *text, int size);
+Element *text_get_element(Text *text);
 void text_set_coordinate(Text *text, SDL_Point coordinate);
 void text_set_color(Text *text, SDL_Color color);
 

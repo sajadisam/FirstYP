@@ -16,6 +16,7 @@ typedef struct {
 } Text;
 
 void text_set_text(Text *text, const char *data);
+void text_draw(Text *text);
 
 Text *text_create(SDL_Renderer *renderer, const char *text,
                   const char *fontPath, int size) {
@@ -26,7 +27,8 @@ Text *text_create(SDL_Renderer *renderer, const char *text,
     assert(txt->font);
   }
   txt->color = (SDL_Color){0, 0, 0, 0};
-  txt->element = element_create((SDL_Rect){0, 0, 0, 0});
+  txt->element =
+      element_create((SDL_Rect){0, 0, 0, 0}, (void (*)(void *))text_draw, txt);
   txt->renderer = renderer;
   text_set_text(txt, text);
   return txt;
@@ -55,6 +57,8 @@ void text_update(Text *text) {
   element_set_rect(text->element,
                    (SDL_Rect){prev.x, prev.y, surface->w, surface->h});
 }
+
+Element *text_get_element(Text *text) { return text->element; }
 
 void text_set_text(Text *text, const char *data) {
   text->text = data;
