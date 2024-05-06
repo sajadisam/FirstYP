@@ -2,7 +2,7 @@
 #define _SETUP_
 
 typedef struct game Game;
-void initalize_sdl();
+void initialize_sdl();
 
 Game *initialize();
 void run(Game *game);

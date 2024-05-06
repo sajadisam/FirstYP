@@ -1,4 +1,3 @@
-#include "../game.h"
 #include "../window/window.h"
 #include "sprite.h"
 #include <SDL2/SDL_rect.h>

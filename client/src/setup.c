@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-void initalize_sdl() {
+void initialize_sdl() {
   if (SDL_Init(SDL_INIT_VIDEO) == -1 || (SDLNet_Init() == -1)) {
     ERR("%s\n", SDL_GetError());
     exit(1);
@@ -20,6 +20,7 @@ void initalize_sdl() {
 }
 
 Game *initialize() {
+  initialize_sdl();
   Window *window = window_create("Zombie hunter", WINDOW_WIDTH, WINDOW_HEIGHT);
   SpriteSheet *playerSprite =
       create_spritesheet(window, "./resources/player.png", 4, 4);
