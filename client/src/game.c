@@ -1,5 +1,6 @@
 #include "entity/mob.h"
 #include "entity/player.h"
+#include "ui/canvas.h"
 #include "ui/text.h"
 #include "window/window.h"
 #include "world/world.h"
@@ -10,8 +11,8 @@
 typedef struct {
   Window *window;
   World *world;
+  Canvas *canvas;
   int selfPlayerId;
-  Text *text;
 } Game;
 
 Player *game_get_self_player(Game *game) {
@@ -65,16 +66,20 @@ Game *game_create(Window *window) {
   game->world = world_create(get_window_renderer(window));
   Player *selfPlayer = player_create();
   game->selfPlayerId = world_add_player(game->world, selfPlayer);
-  world_load_level(game->world, "default", "default");
-  TTF_Init();
-  game->text = text_create(get_window_renderer(window), "test text",
-                           "assets/fonts/sans.ttf", 15);
+  world_load_level(game->world, "dungeon", "dungeon");
+  game->canvas = canvas_create();
+  Text *text =
+      text_create(get_window_renderer(window), "Text coming from canvas",
+                  "assets/fonts/sans.ttf", 20);
+  text_set_color(text, (SDL_Color){255, 255, 255, 255});
+  text_set_coordinate(text, (SDL_Point){10, 20});
+  canvas_add_element(game->canvas, text_get_element(text));
 
-  for (int i = 0; i < 50; i++) {
-    Mob *mob = mob_create();
-    world_add_mob(game->world, mob);
-    mob_set_coord(mob, (SDL_Point){(rand() % 32) * 32, (rand() % 32) * 32});
-  }
+  // for (int i = 0; i < 50; i++) {
+  //   Mob *mob = mob_create();
+  //   world_add_mob(game->world, mob);
+  //   mob_set_coord(mob, (SDL_Point){(rand() % 32) * 32, (rand() % 32) * 32});
+  // }
   return game;
 }
 
@@ -95,8 +100,7 @@ void game_render(Game *game) {
   pivot.y -= window_get_height(game->window) / 2;
 
   world_render(game->world, pivot);
-  text_draw(game->text);
-
+  canvas_render(game->canvas);
   SDL_RenderPresent(renderer);
 }
 
