@@ -1,3 +1,4 @@
+#include "debug.h"
 #include "entity/mob.h"
 #include "entity/player.h"
 #include "net/network.h"
@@ -18,7 +19,7 @@ typedef struct {
 
 Window *get_game_window(const Game *game) { return game->window; }
 World *game_get_world(Game *game) { return game->world; }
-
+Network *game_get_network(Game *game) { return game->network; }
 int window_event_callback(SDL_Event const *event, void *arg) {
   Game *game = arg;
   if (event->type == SDL_QUIT) {
@@ -52,6 +53,7 @@ int window_event_callback(SDL_Event const *event, void *arg) {
       flags &= ~PLAYER_FLAG_MOVE_RIGHT;
     if (code == SDL_SCANCODE_LEFT || code == SDL_SCANCODE_A)
       flags &= ~PLAYER_FLAG_MOVE_LEFT;
+
   } break;
   }
   set_player_flags(player, flags);
@@ -89,7 +91,11 @@ void game_destroy(Game *game) {
 
 void game_update(Game *game, float dt) {
   world_update(game->world, dt);
-  network_update(game->network, game->world);
+  network_update(game->network, game);
+}
+
+Player *game_get_self_player(Game *game) {
+  return world_get_self_player(game->world);
 }
 
 void game_render(Game *game) {

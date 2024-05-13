@@ -16,5 +16,6 @@ void game_render(Game *game);
 Window *get_game_window(const Game *game);
 Player *game_get_self_player(Game *game);
 World *game_get_world(Game *game);
+void *game_get_network(Game *game);
 
 #endif // GAME_H
