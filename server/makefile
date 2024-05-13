@@ -11,22 +11,24 @@ else
 	ifeq ($(UNAME_S), Darwin)
 		INCLUDE = /opt/homebrew/include
 		LIBS := -L /opt/homebrew/lib
-		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_net -lm
+		LDFLAGS = -lSDL2main -lSDL2 -lSDL2_image -lSDL2_ttf -lSDL2_net -lm
 	endif
 endif
 
-
-
 CC=gcc
 CFLAGS = -g -I$(INCLUDE) -c 
-
 
 OBJ := server
 SRC_DIR := src/
 OBJ_DIR := obj/
 
+# src
 SOURCE_FILES := $(wildcard $(SRC_DIR)*.c)
-OBJECT_FILES := $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
+OBJECT_FILES += $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
+
+# entity
+FOLDER := entity
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
@@ -35,8 +37,11 @@ $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 # Build the binary by linking the intermediate files
 $(OBJ): $(OBJECT_FILES)
 	$(CC) $^ -o $(OBJ) $(LDFLAGS) $(LIBS)
+	echo $(OBJECT_FILES)
 
+start:
+	clear && make && ./$(OBJ)
 
-clean:
-	rm ./bin/*
+clean: $(OBJ_DIR)*.o
+	rm $^
 
