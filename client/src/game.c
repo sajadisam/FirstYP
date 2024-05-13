@@ -1,5 +1,6 @@
 #include "entity/mob.h"
 #include "entity/player.h"
+#include "net/network.h"
 #include "ui/canvas.h"
 #include "ui/text.h"
 #include "window/window.h"
@@ -12,12 +13,8 @@ typedef struct {
   Window *window;
   World *world;
   Canvas *canvas;
-  int selfPlayerId;
+  Network *network;
 } Game;
-
-Player *game_get_self_player(Game *game) {
-  return world_get_player(game->world, game->selfPlayerId);
-}
 
 Window *get_game_window(const Game *game) { return game->window; }
 
@@ -26,7 +23,7 @@ int window_event_callback(SDL_Event const *event, void *arg) {
   if (event->type == SDL_QUIT) {
     return 1;
   }
-  Player *player = game_get_self_player(game);
+  Player *player = world_get_self_player(game->world);
   PlayerFlag flags = get_player_flags(player);
   switch (event->type) {
   case SDL_MOUSEMOTION:
@@ -63,11 +60,10 @@ int window_event_callback(SDL_Event const *event, void *arg) {
 Game *game_create(Window *window) {
   Game *game = malloc(sizeof(Game));
   game->window = window;
-  game->world = world_create(get_window_renderer(window));
-  Player *selfPlayer = player_create();
-  game->selfPlayerId = world_add_player(game->world, selfPlayer);
-  world_load_level(game->world, "dungeon", "dungeon");
   game->canvas = canvas_create();
+  game->network = network_create("127.0.0.1", 3030);
+  game->world = world_create(get_window_renderer(window));
+  world_load_level(game->world, "dungeon", "dungeon");
   Text *text =
       text_create(get_window_renderer(window), "Text coming from canvas",
                   "assets/fonts/sans.ttf", 20);
@@ -88,13 +84,16 @@ void game_destroy(Game *game) {
   free(game);
 }
 
-void game_update(Game *game, float dt) { world_update(game->world, dt); }
+void game_update(Game *game, float dt) {
+  world_update(game->world, dt);
+  network_update(game->network, game->world);
+}
 
 void game_render(Game *game) {
   SDL_Renderer *renderer = get_window_renderer(game->window);
   SDL_RenderClear(renderer);
 
-  Player *self_player = game_get_self_player(game);
+  Player *self_player = world_get_self_player(game->world);
   SDL_Point pivot = player_get_coord(self_player);
   pivot.x -= window_get_width(game->window) / 2;
   pivot.y -= window_get_height(game->window) / 2;

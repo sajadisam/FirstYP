@@ -85,6 +85,8 @@ void world_renderer_render_players(WorldRenderer *renderer, World *world,
     Player *player = (Player *)entity_list_get(player_list, i);
     world_renderer_render_player(renderer, player, pivot);
   }
+  Player *self = world_get_self_player(world);
+  world_renderer_render_player(renderer, self, pivot);
 }
 
 void world_renderer_render_mob(WorldRenderer *renderer, Mob *mob,

@@ -22,6 +22,7 @@ Player *world_get_player(World *world, size_t id);
 int world_add_mob(World *world, void *mob);
 
 Mob *world_get_mob(World *world, size_t id);
+Player *world_get_self_player(World *world);
 EntityList *world_get_player_list(World *world);
 EntityList *world_get_mob_list(World *world);
 void world_update(World *world, float dt);

@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 typedef struct {
+  Player *self;
   EntityList *player_list;
   EntityList *mob_list;
   Level *level;
@@ -17,6 +18,7 @@ typedef struct {
 World *world_create(SDL_Renderer *renderer) {
   World *world = malloc(sizeof(World));
   world->player_list = entity_list_create(32, (void (*)(void *))player_destroy);
+  world->self = player_create();
   world->mob_list = entity_list_create(128, (void (*)(void *))mob_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
@@ -55,6 +57,7 @@ void world_update(World *world, float dt) {
     Player *player = entity_list_get(world->player_list, i);
     player_update(player, dt);
   }
+  player_update(world->self, dt);
 }
 
 void world_render(World *world, SDL_Point pivot) {
@@ -70,6 +73,8 @@ int world_add_player(World *world, void *player) {
 Player *world_get_player(World *world, int id) {
   return entity_list_get(world->player_list, id);
 }
+
+Player *world_get_self_player(World *world) { return world->self; }
 
 int world_add_mob(World *world, void *mob) {
   return entity_list_add(world->mob_list, mob);
