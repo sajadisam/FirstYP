@@ -1,6 +1,9 @@
+#include "../../../lib/network_constants.h"
 #include "../debug.h"
 #include "../entity/player.h"
+#include "../game.h"
 #include "../world/world.h"
+#include "net_player.h"
 #include <SDL2/SDL_net.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,22 +42,33 @@ Network *network_create(const char *host, int port) {
   return network;
 }
 
-void network_update(Network *network, World *world) {
+void network_update_player_movement(Game *game) {
+  Network *network = game_get_network(game);
+  Player *self = world_get_self_player(game_get_world(game));
+  PlayerFlag selfFlag = player_get_flags(self);
+  if (selfFlag & PLAYER_FLAG_MOVE_ANY) {
+    char buffer[1024];
+    SDL_Point coord = player_get_coord(self);
+    sprintf(buffer, "%d %d %d %d %d ", OPCODE_PLAYERMOVE, player_get_id(self),
+            coord.x, coord.y, selfFlag);
+    if (network->socket)
+      SDLNet_TCP_Send(network->socket, buffer, 1024);
+  }
+}
+
+void network_update(Network *network, Game *game) {
+  network_update_player_movement(game);
+
   if (!(SDLNet_CheckSockets(network->socket_set, 0) > 0))
     return;
+
   if (!SDLNet_SocketReady(network->socket))
     return;
   char message[1024];
   int len = SDLNet_TCP_Recv(network->socket, message, 1024);
   if (len <= 0) {
   } else {
-    DEBUG("RECEIVED: %s\n", message);
-    Player *player = player_create();
-    int id = 0;
-    char opcode[1024];
-    sscanf(message, "%s %d", opcode, &id);
-    player_set_id(player, id);
-    world_add_player(world, player);
+    net_player_react(game_get_world(game), message);
   }
 }
 
