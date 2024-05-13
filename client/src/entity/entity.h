@@ -9,6 +9,7 @@ void entity_destroy(Entity *entity);
 
 void entity_move_coord(Entity *entity, float dx, float dy);
 
+SDL_Point entity_get_prev_coord(const Entity *entity);
 SDL_Point entity_get_coord(Entity const *entity);
 void entity_set_coord(Entity *entity, SDL_Point coord);
 

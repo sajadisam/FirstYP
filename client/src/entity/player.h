@@ -10,6 +10,7 @@ Player *player_create();
 void player_destroy(Player *player);
 
 void player_update(Player *player, float dt);
+void player_update_direction(Player *player);
 void player_update_movement(Player *player, float dt);
 
 PlayerFlag get_player_flags(const Player *player);

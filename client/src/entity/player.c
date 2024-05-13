@@ -31,23 +31,35 @@ void player_destroy(Player *player) {
   free(player);
 }
 
+void player_update_direction(Player *player) {
+  SDL_Point prev = entity_get_prev_coord(player->entity);
+  SDL_Point new = entity_get_coord(player->entity);
+  int alphaX = prev.x - new.x;
+  int alphaY = prev.y - new.y;
+  if (alphaY == 0) {
+    if (alphaX < 0) // Right
+      animation_set_base(player->move_animation, 8);
+    else // Left
+      animation_set_base(player->move_animation, 12);
+  }
+  if (alphaX == 0) {
+    if (alphaY < 0) // up
+      animation_set_base(player->move_animation, 0);
+    else // down
+      animation_set_base(player->move_animation, 4);
+  }
+}
+
 void player_update_movement(Player *player, float dt) {
-  if (player->flags & PLAYER_FLAG_MOVE_DOWN) {
-    animation_set_base(player->move_animation, 0);
+  if (player->flags & PLAYER_FLAG_MOVE_DOWN)
     entity_move_coord(player->entity, 0, player->speed * dt);
-  }
-  if (player->flags & PLAYER_FLAG_MOVE_UP) {
-    animation_set_base(player->move_animation, 4);
+  if (player->flags & PLAYER_FLAG_MOVE_UP)
     entity_move_coord(player->entity, 0, -player->speed * dt);
-  }
-  if (player->flags & PLAYER_FLAG_MOVE_RIGHT) {
-    animation_set_base(player->move_animation, 8);
+  if (player->flags & PLAYER_FLAG_MOVE_RIGHT)
     entity_move_coord(player->entity, player->speed * dt, 0);
-  }
-  if (player->flags & PLAYER_FLAG_MOVE_LEFT) {
-    animation_set_base(player->move_animation, 12);
+  if (player->flags & PLAYER_FLAG_MOVE_LEFT)
     entity_move_coord(player->entity, -player->speed * dt, 0);
-  }
+  player_update_direction(player);
 }
 
 void player_update(Player *player, float dt) {
