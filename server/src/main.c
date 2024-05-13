@@ -1,14 +1,9 @@
-#include "client.h"
 #include "../../lib/debug.h"
 #include "server.h"
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_endian.h>
-#include <SDL2/SDL_error.h>
 #include <SDL2/SDL_net.h>
-#include <SDL2/SDL_timer.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <time.h>
 
 int main() {

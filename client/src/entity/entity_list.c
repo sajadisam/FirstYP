@@ -54,9 +54,9 @@ void entity_list_remove(EntityList *entityList, void *entity) {
   entityList->size--;
 }
 
-void *entity_list_get(EntityList *entityList, int id) {
-  assert(id < entityList->size);
-  return entityList->storage[id];
+void *entity_list_get(EntityList *entityList, int index) {
+  assert(index < entityList->size);
+  return entityList->storage[index];
 }
 
 int entity_list_size(EntityList *entityList) { return entityList->size; }

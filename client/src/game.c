@@ -17,6 +17,7 @@ typedef struct {
 } Game;
 
 Window *get_game_window(const Game *game) { return game->window; }
+World *game_get_world(Game *game) { return game->world; }
 
 int window_event_callback(SDL_Event const *event, void *arg) {
   Game *game = arg;
@@ -61,9 +62,10 @@ Game *game_create(Window *window) {
   Game *game = malloc(sizeof(Game));
   game->window = window;
   game->canvas = canvas_create();
-  game->network = network_create("127.0.0.1", 3030);
   game->world = world_create(get_window_renderer(window));
   world_load_level(game->world, "dungeon", "dungeon");
+  game->network = network_create("127.0.0.1", 3030);
+
   Text *text =
       text_create(get_window_renderer(window), "Text coming from canvas",
                   "assets/fonts/sans.ttf", 20);
@@ -71,11 +73,12 @@ Game *game_create(Window *window) {
   text_set_coordinate(text, (SDL_Point){10, 20});
   canvas_add_element(game->canvas, text_get_element(text));
 
-  for (int i = 0; i < 10; i++) {
-    Mob *mob = mob_create();
-    world_add_mob(game->world, mob);
-    mob_set_coord(mob, (SDL_Point){(rand() % 256) * 256, (rand() % 256) * 256});
-  }
+  // for (int i = 0; i < 10; i++) {
+  //   Mob *mob = mob_create();
+  //   world_add_mob(game->world, mob);
+  //   mob_set_coord(mob, (SDL_Point){(rand() % 256) * 256, (rand() % 256) *
+  //   256});
+  // }
   return game;
 }
 

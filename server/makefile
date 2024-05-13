@@ -46,5 +46,5 @@ start:
 	clear && make && ./$(OBJ)
 
 clean: $(OBJ_DIR)*.o
-	rm $^
+	rm $^ && rm $(OBJ)
 

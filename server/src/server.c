@@ -3,6 +3,7 @@
 #include <SDL2/SDL_net.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define MAX_CLIENTS 100
 
@@ -49,25 +50,35 @@ void server_add_client(Server *server) {
     SDL_Delay(100);
     return;
   }
+
   Client *client = client_create(socket);
   IPaddress *ip = client_get_ip(client);
   Uint32 ipaddr = SDL_Swap32(ip->host);
 
-  // for (int i = 0; i < server->clients_connected; i++) {
-  //   Client *target = server->clients[i];
-  //   char message[1024];
-  //   sprintf(message, "ALREADY JOINED %d", client_get_id(target));
-  //   // SDLNet_TCP_Send(client_get_socket(target), message, strlen(message));
-  //   SDLNet_TCP_Send(socket, message, strlen(message) + 1);
-  // }
+  for (int i = 0; i < server->clients_connected; i++) {
+    Client *target = server->clients[i];
+    char message[1024];
+    sprintf(message, "JOINED %d", client_get_id(target));
+    client_send_message(client, message);
+  }
+
+  for (int i = 0; i < server->clients_connected; i++) {
+    Client *target = server->clients[i];
+    char message[1024];
+    int targetID = client_get_id(target);
+    if (targetID != client_get_id(client)) {
+      sprintf(message, "JOINED %d", client_get_id(target));
+      client_send_message(target, message);
+    }
+  }
 
   server->clients[server->clients_connected] = client;
   server->clients_connected++;
 
-  INFO("Accepted a connection from %d.%d.%d.%d on port %hu with %d users\n",
+  INFO("Accepted a connection from %d.%d.%d.%d on port %hu with %d users id: "
+       "%d\n",
        ipaddr >> 24, (ipaddr >> 16) & 0xFF, (ipaddr >> 8) & 0xFF, ipaddr & 0xFF,
-       ip->port, server->clients_connected);
-
+       ip->port, server->clients_connected, client_get_id(client));
   SDLNet_AddSocket(server->socket_set, (SDLNet_GenericSocket)socket);
 }
 

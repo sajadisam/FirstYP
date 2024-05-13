@@ -19,7 +19,7 @@ World *world_create(SDL_Renderer *renderer) {
   World *world = malloc(sizeof(World));
   world->player_list = entity_list_create(32, (void (*)(void *))player_destroy);
   world->self = player_create();
-  world->mob_list = entity_list_create(128, (void (*)(void *))mob_destroy);
+  world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   return world;

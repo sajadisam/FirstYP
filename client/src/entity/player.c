@@ -78,3 +78,5 @@ SDL_Point player_get_coord(Player *player) {
 int player_get_draw_frame_id(const Player *player) {
   return animation_get_frame(player->move_animation);
 }
+
+void player_set_id(Player *player, int id) { player->id = id; }

@@ -1,5 +1,6 @@
 #include "../debug.h"
-#include "../game.h"
+#include "../entity/player.h"
+#include "../world/world.h"
 #include <SDL2/SDL_net.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,15 +39,22 @@ Network *network_create(const char *host, int port) {
   return network;
 }
 
-void network_update(Network *network, Game *game) {
-  if (!network || !(SDLNet_CheckSockets(network->socket_set, 0) > 0))
+void network_update(Network *network, World *world) {
+  if (!(SDLNet_CheckSockets(network->socket_set, 0) > 0))
     return;
-  if (SDLNet_SocketReady(network->socket)) {
-    char message[1024];
-    int len = SDLNet_TCP_Recv(network->socket, message, 1024);
-    DEBUG("received: %s\n", message);
+  if (!SDLNet_SocketReady(network->socket))
+    return;
+  char message[1024];
+  int len = SDLNet_TCP_Recv(network->socket, message, 1024);
+  if (len <= 0) {
   } else {
-    DEBUG("Message received\n");
+    DEBUG("RECEIVED: %s\n", message);
+    Player *player = player_create();
+    int id = 0;
+    char opcode[1024];
+    sscanf(message, "%s %d", opcode, &id);
+    player_set_id(player, id);
+    world_add_player(world, player);
   }
 }
 

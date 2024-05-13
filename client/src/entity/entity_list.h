@@ -11,7 +11,7 @@ int entity_list_indexof(EntityList *entityList, void *entity);
 int entity_list_add(EntityList *entityList, void *entity);
 void entity_list_remove(EntityList *entityList, void *entity);
 
-void *entity_list_get(EntityList *entityList, int id);
+void *entity_list_get(EntityList *entityList, int index);
 int entity_list_size(EntityList *entityList);
 
 #endif // ENTITY_LIST_H

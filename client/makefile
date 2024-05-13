@@ -17,7 +17,7 @@ endif
 
 # Linking and compilation
 
-CC=gcc
+CC=gcc 
 CFLAGS = -g -I$(INCLUDE) -c 
 
 OBJ := client

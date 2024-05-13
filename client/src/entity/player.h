@@ -16,5 +16,6 @@ PlayerFlag get_player_flags(const Player *player);
 void set_player_flags(Player *player, PlayerFlag flags);
 SDL_Point player_get_coord(const Player *player);
 int player_get_draw_frame_id(Player const *player);
+void player_set_id(Player *player, int id);
 
 #endif // PLAYER_H

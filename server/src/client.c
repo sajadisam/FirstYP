@@ -1,6 +1,9 @@
 #include "../../lib/debug.h"
 #include "../../lib/misc.h"
 #include <SDL2/SDL_net.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <string.h>
 
 typedef struct {
   int id;
@@ -24,3 +27,8 @@ Client *client_create(TCPsocket socket) {
 TCPsocket client_get_socket(Client *client) { return client->socket; }
 IPaddress *client_get_ip(Client *client) { return client->ip; }
 int client_get_id(Client *client) { return client->id; }
+
+bool client_send_message(Client *client, const char *message, int len) {
+  SDLNet_TCP_Send(client->socket, message, 1024);
+  return true;
+}
