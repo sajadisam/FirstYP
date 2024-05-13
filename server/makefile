@@ -16,7 +16,7 @@ else
 endif
 
 CC=gcc
-CFLAGS = -g -I$(INCLUDE) -c 
+CFLAGS = -g -I$(INCLUDE) -I../lib/ -c 
 
 OBJ := server
 SRC_DIR := src/
@@ -29,6 +29,9 @@ OBJECT_FILES += $(patsubst $(SRC_DIR)%.c,$(OBJ_DIR)%.o,$(SOURCE_FILES))
 # entity
 FOLDER := entity
 OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
+
+# lib
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst ../lib/%.c,$(OBJ_DIR)%.o,$(wildcard ./../lib/*.c))
 
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c

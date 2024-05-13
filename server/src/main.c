@@ -1,5 +1,5 @@
 #include "client.h"
-#include "debug.h"
+#include "../../lib/debug.h"
 #include "server.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_endian.h>

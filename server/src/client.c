@@ -1,5 +1,5 @@
-#include "debug.h"
-#include "misc.h"
+#include "../../lib/debug.h"
+#include "../../lib/misc.h"
 #include <SDL2/SDL_net.h>
 
 typedef struct {
