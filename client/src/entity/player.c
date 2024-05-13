@@ -31,26 +31,36 @@ void player_destroy(Player *player) {
   free(player);
 }
 
-void player_update_direction(Player *player) {
+bool player_moved(Player *player) {
   SDL_Point prev = entity_get_prev_coord(player->entity);
   SDL_Point new = entity_get_coord(player->entity);
   int alphaX = prev.x - new.x;
   int alphaY = prev.y - new.y;
-  if (alphaY == 0) {
-    if (alphaX < 0) // Right
+  return !alphaX || !alphaY;
+}
+
+void player_update_direction(Player *player) {
+  SDL_Point prev = entity_get_prev_coord(player->entity);
+  SDL_Point new = entity_get_coord(player->entity);
+  int deltaX = prev.x - new.x;
+  int deltaY = prev.y - new.y;
+  if (deltaY == 0) {
+    if (deltaX < 0) // Right
       animation_set_base(player->move_animation, 8);
     else // Left
       animation_set_base(player->move_animation, 12);
   }
-  if (alphaX == 0) {
-    if (alphaY < 0) // up
+  if (deltaX == 0) {
+    if (deltaY < 0) // up
       animation_set_base(player->move_animation, 0);
     else // down
       animation_set_base(player->move_animation, 4);
   }
 }
 
-void player_update_movement(Player *player, float dt) {
+PlayerFlag player_get_flags(Player *player) { return player->flags; }
+
+void player_move_on_flags(Player *player, float dt) {
   if (player->flags & PLAYER_FLAG_MOVE_DOWN)
     entity_move_coord(player->entity, 0, player->speed * dt);
   if (player->flags & PLAYER_FLAG_MOVE_UP)
@@ -59,7 +69,6 @@ void player_update_movement(Player *player, float dt) {
     entity_move_coord(player->entity, player->speed * dt, 0);
   if (player->flags & PLAYER_FLAG_MOVE_LEFT)
     entity_move_coord(player->entity, -player->speed * dt, 0);
-  player_update_direction(player);
 }
 
 void player_update(Player *player, float dt) {
@@ -69,7 +78,8 @@ void player_update(Player *player, float dt) {
           (PLAYER_FLAG_MOVE_VERTICAL | PLAYER_FLAG_MOVE_HORIZONTAL)) {
     return;
   }
-  player_update_movement(player, dt);
+
+  player_update_direction(player);
   if ((player->flags & PLAYER_FLAG_MOVE_ANY) == 0) {
     animation_set_frame(player->move_animation, 1);
   } else {
@@ -92,3 +102,12 @@ int player_get_draw_frame_id(const Player *player) {
 }
 
 void player_set_id(Player *player, int id) { player->id = id; }
+
+int player_get_id(Player *player) { return player->id; }
+void player_set_flags(Player *player, PlayerFlag flags) {
+  player->flags = flags;
+}
+
+void player_set_coord(Player *player, int x, int y) {
+  entity_set_coord(player->entity, (SDL_Point){x, y});
+}

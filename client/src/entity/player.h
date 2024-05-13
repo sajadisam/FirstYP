@@ -3,6 +3,7 @@
 
 #include "SDL2/SDL_rect.h"
 #include "player_common.h"
+#include <stdbool.h>
 
 typedef struct Player Player;
 
@@ -18,5 +19,11 @@ void set_player_flags(Player *player, PlayerFlag flags);
 SDL_Point player_get_coord(const Player *player);
 int player_get_draw_frame_id(Player const *player);
 void player_set_id(Player *player, int id);
+int player_get_id(Player *player);
+void player_set_coord(Player *player, int x, int y);
+bool player_moved(Player *player);
+PlayerFlag player_get_flags(Player *player);
+void player_set_flags(Player *player, PlayerFlag flags);
+void player_move_on_flags(Player *player, float dt);
 
 #endif // PLAYER_H
