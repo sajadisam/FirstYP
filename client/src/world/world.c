@@ -53,10 +53,12 @@ void world_load_level(World *world, char const *tilesetName,
 
 void world_update(World *world, float dt) {
   int player_count = entity_list_size(world->player_list);
+
   for (int i = 0; i < player_count; i++) {
     Player *player = entity_list_get(world->player_list, i);
     player_update(player, dt);
   }
+  player_move_on_flags(world->self, dt);
   player_update(world->self, dt);
 }
 
@@ -70,8 +72,18 @@ int world_add_player(World *world, void *player) {
   return entity_list_add(world->player_list, player);
 }
 
-Player *world_get_player(World *world, int id) {
-  return entity_list_get(world->player_list, id);
+Player *world_get_player(World *world, int index) {
+  return entity_list_get(world->player_list, index);
+}
+
+Player *world_get_player_from_id(World *world, int id) {
+  for (int i = 0; i < entity_list_size(world->player_list); i++) {
+    Player *player = entity_list_get(world->player_list, i);
+    if (player_get_id(player) == id) {
+      return player;
+    }
+  }
+  return NULL;
 }
 
 Player *world_get_self_player(World *world) { return world->self; }

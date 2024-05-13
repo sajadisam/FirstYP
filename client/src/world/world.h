@@ -18,7 +18,8 @@ void world_load_level(World *world, char const *tilesetName,
 Level *world_get_level(World *world);
 
 int world_add_player(World *world, void *player);
-Player *world_get_player(World *world, size_t id);
+Player *world_get_player(World *world, size_t index);
+Player *world_get_player_from_id(World *world, int id);
 int world_add_mob(World *world, void *mob);
 
 Mob *world_get_mob(World *world, size_t id);
