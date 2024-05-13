@@ -6,3 +6,5 @@ void on_sdl_error() {
   SDL_Quit();
   exit(5);
 }
+
+int randomi32(int min, int max) { return rand() % (max + 1 - min) + min; }
