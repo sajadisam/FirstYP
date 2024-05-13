@@ -86,6 +86,10 @@ Player *world_get_player_from_id(World *world, int id) {
   return NULL;
 }
 
+void world_remove_player(World *world, Player *player) {
+  entity_list_remove(world->player_list, player);
+}
+
 Player *world_get_self_player(World *world) { return world->self; }
 
 int world_add_mob(World *world, void *mob) {

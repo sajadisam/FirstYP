@@ -4,6 +4,11 @@
 #include "../world/world.h"
 #include <stdio.h>
 
+void net_player_disconnect(World *world, int id) {
+  Player *player = world_get_player_from_id(world, id);
+  world_remove_player(world, player);
+}
+
 void net_player_join(World *world, int id) {
   Player *player = player_create();
   player_set_id(player, id);
@@ -38,6 +43,9 @@ void net_player_react(World *world, const char *message) {
     net_player_join(world, id);
   } break;
   case OPCODE_DISCONNECT: {
+    int id;
+    sscanf(message, "%d %d ", &opcode, &id);
+    net_player_disconnect(world, id);
   } break;
   case OPCODE_PLAYERMOVE: {
     int id, x, y, flags;

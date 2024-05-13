@@ -92,6 +92,14 @@ void handle_client_disconnection(Server *server, Client *client) {
   TCPsocket socket = client_get_socket(client);
   SDLNet_TCP_DelSocket(server->socket_set, socket);
   SDLNet_TCP_Close(socket);
+
+  for (int i = 0; i < server->clients_connected; i++) {
+    Client *target = server->clients[i];
+    char message[1024];
+    sprintf(message, "%d %d", OPCODE_DISCONNECT, client_get_id(client));
+    client_send_message(target, message);
+  }
+
   for (int i = 0; i < server->clients_connected; i++) {
     Client *target = server->clients[i];
     int clientID = client_get_id(client);
