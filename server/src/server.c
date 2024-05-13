@@ -1,6 +1,7 @@
 #include "../../lib/debug.h"
 #include "client.h"
 #include <SDL2/SDL_net.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #define MAX_CLIENTS 100
@@ -51,11 +52,22 @@ void server_add_client(Server *server) {
   Client *client = client_create(socket);
   IPaddress *ip = client_get_ip(client);
   Uint32 ipaddr = SDL_Swap32(ip->host);
+
+  // for (int i = 0; i < server->clients_connected; i++) {
+  //   Client *target = server->clients[i];
+  //   char message[1024];
+  //   sprintf(message, "ALREADY JOINED %d", client_get_id(target));
+  //   // SDLNet_TCP_Send(client_get_socket(target), message, strlen(message));
+  //   SDLNet_TCP_Send(socket, message, strlen(message) + 1);
+  // }
+
   server->clients[server->clients_connected] = client;
   server->clients_connected++;
+
   INFO("Accepted a connection from %d.%d.%d.%d on port %hu with %d users\n",
        ipaddr >> 24, (ipaddr >> 16) & 0xFF, (ipaddr >> 8) & 0xFF, ipaddr & 0xFF,
        ip->port, server->clients_connected);
+
   SDLNet_AddSocket(server->socket_set, (SDLNet_GenericSocket)socket);
 }
 
@@ -69,7 +81,7 @@ void handle_client_disconnection(Server *server, Client *client) {
     if (client_get_id(target) == clientID) {
       DEBUG("Closing client: index(%d) id(%d) total(%d)\n", i, clientID,
             server->clients_connected);
-      for (int x = i; x < server->clients_connected; x++) {
+      for (int x = i; x < server->clients_connected - 1; x++) {
         WARN("swapping clients: %d\n", server->clients_connected);
         server->clients[x] = server->clients[x + 1];
       }
@@ -95,7 +107,6 @@ void server_loop(Server *server) {
     TCPsocket socket = client_get_socket(client);
     if (!socket)
       continue;
-
     if (SDLNet_SocketReady(socket)) {
       char message[1024];
       int len = SDLNet_TCP_Recv(socket, message, 1024);
