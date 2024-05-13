@@ -16,7 +16,7 @@ else
 endif
 
 CC=gcc
-CFLAGS = -g -I$(INCLUDE) -I../lib/ -c 
+CFLAGS = -g -I$(INCLUDE) -c 
 
 OBJ := server
 SRC_DIR := src/

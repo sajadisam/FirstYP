@@ -25,7 +25,7 @@ int main() {
     if (SDLNet_SocketReady(server_get_socket(server))) {
       server_add_client(server);
     } else {
-      server_loop(server);
+      server_run(server);
     }
   }
 
