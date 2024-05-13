@@ -7,6 +7,7 @@
 #include <stdlib.h>
 
 typedef struct {
+  int id;
   Entity *entity;
   PlayerFlag flags;
   float speed;
@@ -16,6 +17,7 @@ typedef struct {
 Player *player_create() {
   Player *player = malloc(sizeof(Player));
   player->entity = entity_create();
+  player->id = -1;
   entity_move_coord(player->entity, 1500, 1500);
   player->flags = PLAYER_FLAG_NONE;
   player->speed = 2.0f * 60.0f;
