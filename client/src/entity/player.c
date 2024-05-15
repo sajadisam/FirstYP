@@ -21,7 +21,7 @@ Player *player_create() {
   entity_move_coord(player->entity, 1500, 1500);
   player->flags = PLAYER_FLAG_NONE;
   player->speed = 2.0f * 60.0f;
-  player->move_animation = animation_create(0.075f, 4);
+  player->move_animation = animation_create(0.075f, 3);
   return player;
 }
 
@@ -46,15 +46,15 @@ void player_update_direction(Player *player) {
   int deltaY = prev.y - new.y;
   if (deltaY == 0) {
     if (deltaX < 0) // Right
-      animation_set_base(player->move_animation, 8);
+      animation_set_base(player->move_animation, 6);
     else // Left
-      animation_set_base(player->move_animation, 12);
+      animation_set_base(player->move_animation, 3);
   }
   if (deltaX == 0) {
     if (deltaY < 0) // up
       animation_set_base(player->move_animation, 0);
     else // down
-      animation_set_base(player->move_animation, 4);
+      animation_set_base(player->move_animation, 9);
   }
 }
 
