@@ -1,7 +1,7 @@
 #ifndef _COLLIDER_COMMON_
 #define _COLLIDER_COMMON_
 
-typedef void (*OnCollisionFunc)(void *colliderA, void *colliderB);
+typedef void (*OnCollisionFunc)(void *entity, void *colliderB);
 
 typedef enum {
   COLLIDER_PLAYER,

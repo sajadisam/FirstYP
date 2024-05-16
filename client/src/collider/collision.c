@@ -1,4 +1,5 @@
 #include "../entity/entity_list.h"
+#include "../world/world.h"
 #include "collider.h"
 #include <stdlib.h>
 
@@ -17,7 +18,7 @@ void collision_destroy(Collision *collision) {
   entity_list_destroy(collision->colliders);
 }
 
-void collision_update(Collision *collision) {
+void collision_update(World *world, Collision *collision) {
   int len = entity_list_size(collision->colliders);
   for (int i = 0; i < len; i++) {
     Collider *a = entity_list_get(collision->colliders, i);
@@ -25,7 +26,9 @@ void collision_update(Collision *collision) {
       if (x == i)
         continue;
       Collider *b = entity_list_get(collision->colliders, x);
-      collider_execute(a, b);
+      if (collider_execute(a, b)) {
+        world_on_collision(world, a, b);
+      }
     }
   }
 }

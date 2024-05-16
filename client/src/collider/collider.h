@@ -3,6 +3,7 @@
 
 #include "collider_common.h"
 #include <SDL2/SDL_rect.h>
+#include <stdbool.h>
 typedef struct Collider Collider;
 
 Collider *collider_create(SDL_Rect rect, ColliderType type, void *entity,
@@ -15,6 +16,6 @@ void collider_set_rect(Collider *collider, SDL_Rect rect);
 void *collider_get_entity(Collider *collider);
 ColliderType collider_get_type(Collider *collider);
 SDL_Rect collider_get_rect(Collider *collider);
-void collider_execute(Collider *a, Collider *b);
+bool collider_execute(Collider *a, Collider *b);
 
 #endif // !_COLLIDER_

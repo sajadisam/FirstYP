@@ -42,9 +42,11 @@ bool collider_check(Collider *a, Collider *b) {
   return SDL_HasIntersection(&a->rect, &b->rect);
 }
 
-void collider_execute(Collider *a, Collider *b) {
+bool collider_execute(Collider *a, Collider *b) {
   if (collider_check(a, b)) {
     a->on_collision(a->entity, b);
     b->on_collision(b->entity, a);
+    return true;
   }
+  return false;
 }
