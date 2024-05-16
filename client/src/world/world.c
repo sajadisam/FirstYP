@@ -83,6 +83,7 @@ void world_render(World *world, SDL_Point pivot) {
 Level *world_get_level(World *world) { return world->level; }
 
 int world_add_player(World *world, void *player) {
+  world_add_collider(world, player_get_collider(player));
   return entity_list_add(world->player_list, player);
 }
 
@@ -101,6 +102,7 @@ Player *world_get_player_from_id(World *world, int id) {
 }
 
 void world_remove_player(World *world, Player *player) {
+  world_remove_collider(world, player_get_collider(player));
   entity_list_remove(world->player_list, player);
 }
 

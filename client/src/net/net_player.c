@@ -5,17 +5,14 @@
 
 void net_player_disconnect(World *world, int id) {
   Player *player = world_get_player_from_id(world, id);
-  if (player) {
-    world_remove_collider(world, player_get_collider(player));
+  if (player)
     world_remove_player(world, player);
-  }
 }
 
 void net_player_join(World *world, int id) {
   Player *player = player_create();
   player_set_id(player, id);
   world_add_player(world, player);
-  world_add_collider(world, player_get_collider(player));
 }
 
 void net_player_player_move(World *world, int id, int x, int y, int flags) {
