@@ -1,9 +1,11 @@
+#include "../collider/collider.h"
 #include "animation.h"
 #include "entity.h"
 #include "player_common.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_rect.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -12,7 +14,15 @@ typedef struct {
   PlayerFlag flags;
   float speed;
   Animation *move_animation;
+  Collider *collider;
 } Player;
+
+void player_on_collision(Player *playerA, Collider *b) {
+  if (collider_get_type(b) == COLLIDER_PLAYER) {
+    Player *playerB = (Player *)b;
+    printf("Player %d got collided!\n", playerA->id);
+  }
+}
 
 Player *player_create() {
   Player *player = malloc(sizeof(Player));
@@ -22,6 +32,12 @@ Player *player_create() {
   player->flags = PLAYER_FLAG_NONE;
   player->speed = 2.0f * 60.0f;
   player->move_animation = animation_create(0.075f, 3);
+
+  SDL_Point coordinate = entity_get_coord(player->entity);
+  player->collider = collider_create(
+      (SDL_Rect){
+          .x = coordinate.x, .y = coordinate.y, .w = 64 / 2, .h = 64 / 2},
+      COLLIDER_PLAYER, player, (void (*)(void *, void *))player_on_collision);
   return player;
 }
 
@@ -29,14 +45,6 @@ void player_destroy(Player *player) {
   animation_destroy(player->move_animation);
   entity_destroy(player->entity);
   free(player);
-}
-
-bool player_moved(Player *player) {
-  SDL_Point prev = entity_get_prev_coord(player->entity);
-  SDL_Point new = entity_get_coord(player->entity);
-  int alphaX = prev.x - new.x;
-  int alphaY = prev.y - new.y;
-  return !alphaX || !alphaY;
 }
 
 void player_update_direction(Player *player) {
@@ -78,13 +86,15 @@ void player_update(Player *player, float dt) {
           (PLAYER_FLAG_MOVE_VERTICAL | PLAYER_FLAG_MOVE_HORIZONTAL)) {
     return;
   }
-
   player_update_direction(player);
   if ((player->flags & PLAYER_FLAG_MOVE_ANY) == 0) {
     animation_set_frame(player->move_animation, 1);
   } else {
     animation_update(player->move_animation, dt);
   }
+
+  SDL_Point coordinate = entity_get_coord(player->entity);
+  collider_set_coordinate(player->collider, coordinate.x, coordinate.y);
 }
 
 PlayerFlag get_player_flags(Player *player) { return player->flags; }
@@ -100,6 +110,8 @@ SDL_Point player_get_coord(Player *player) {
 int player_get_draw_frame_id(const Player *player) {
   return animation_get_frame(player->move_animation);
 }
+
+Collider *player_get_collider(Player *player) { return player->collider; }
 
 void player_set_id(Player *player, int id) { player->id = id; }
 
