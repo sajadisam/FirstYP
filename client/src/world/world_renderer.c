@@ -3,6 +3,7 @@
 #include "SDL2/SDL_render.h"
 #include "level_common.h"
 #include "world.h"
+#include <stdio.h>
 
 typedef struct {
   SDL_Renderer *sdl_renderer;
@@ -67,7 +68,12 @@ void world_renderer_render_level(WorldRenderer *renderer, Level *level,
 void world_renderer_render_player(WorldRenderer *renderer, Player *player,
                                   SDL_Point pivot) {
   SDL_Point coord = player_get_coord(player);
-  SDL_Rect rect = {.x = coord.x, .y = coord.y, .w = 17 * 2, .h = 28 * 2};
+  SDL_Rect rect = {
+      .x = coord.x,
+      .y = coord.y,
+      .w = spritesheet_get_cellwidth(renderer->player_sprite_sheet),
+      .h = spritesheet_get_cellheight(renderer->player_sprite_sheet)};
+
   world_renderer_project_coord(&rect, pivot);
   int draw_frame = player_get_draw_frame_id(player);
   int cell_x =

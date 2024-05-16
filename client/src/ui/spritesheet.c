@@ -42,5 +42,6 @@ void spritesheet_draw(SDL_Renderer *renderer, SpriteSheet *sheet, int cellX,
 }
 
 int spritesheet_get_width(SpriteSheet *sheet) { return sheet->width; }
-
 int spritesheet_get_height(SpriteSheet *sheet) { return sheet->height; }
+int spritesheet_get_cellwidth(SpriteSheet *sheet) { return sheet->cellWidth; }
+int spritesheet_get_cellheight(SpriteSheet *sheet) { return sheet->cellHeight; }
