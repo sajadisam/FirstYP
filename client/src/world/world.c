@@ -1,3 +1,5 @@
+#include "../collider/collider.h"
+#include "../collider/collision.h"
 #include "../entity/entity_list.h"
 #include "../entity/mob.h"
 #include "../entity/player.h"
@@ -13,20 +15,24 @@ typedef struct {
   EntityList *mob_list;
   Level *level;
   WorldRenderer *renderer;
+  Collision *collision;
 } World;
 
 World *world_create(SDL_Renderer *renderer) {
   World *world = malloc(sizeof(World));
   world->player_list = entity_list_create(32, (void (*)(void *))player_destroy);
   world->self = player_create();
+  world->collision = collision_create();
   world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
+  collision_add_collider(world->collision, player_get_collider(world->self));
   return world;
 }
 
 void world_destroy(World *world) {
   world_renderer_destroy(world->renderer);
+  collision_destroy(world->collision);
   entity_list_destroy(world->player_list);
   entity_list_destroy(world->mob_list);
   level_destroy(world->level);
@@ -53,13 +59,21 @@ void world_load_level(World *world, char const *tilesetName,
 
 void world_update(World *world, float dt) {
   int player_count = entity_list_size(world->player_list);
-
   for (int i = 0; i < player_count; i++) {
     Player *player = entity_list_get(world->player_list, i);
     player_update(player, dt);
   }
   player_move_on_flags(world->self, dt);
   player_update(world->self, dt);
+  collision_update(world->collision);
+}
+
+void world_add_collider(World *world, Collider *collider) {
+  collision_add_collider(world->collision, collider);
+}
+
+void world_remove_collider(World *world, Collider *collider) {
+  collision_remove_collider(world->collision, collider);
 }
 
 void world_render(World *world, SDL_Point pivot) {
