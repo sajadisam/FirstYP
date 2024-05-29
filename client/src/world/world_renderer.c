@@ -7,6 +7,7 @@
 #include "../ui/text.h"
 #include "../ui/canvas.h"
 #include "../ui/health.h"
+#include "../ui/game_over.h"
 #include "SDL2/SDL_render.h"
 #include "level_common.h"
 #include "world.h"
@@ -18,6 +19,7 @@ typedef struct {
   SpriteSheet *mob_sprite_sheet;
   Sprite *projectile_sprite;
   HealthBar *health_bar;
+  GameOverScreen *game_over_screen;
 } WorldRenderer;
 
 WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
@@ -30,12 +32,14 @@ WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
   world_renderer->projectile_sprite =
       sprite_create(renderer, "assets/sprites/projectile.png");
     world_renderer->health_bar = health_bar_create(renderer);
+    world_renderer->game_over_screen = game_over_screen_create(renderer, "You suck tomatoes!", "assets/fonts/sans.ttf", 48);
   return world_renderer;
 }
 
 void world_renderer_destroy(WorldRenderer *world_renderer) {
   spritesheet_destroy(world_renderer->player_sprite_sheet);
   health_bar_destroy(world_renderer->health_bar);
+  game_over_screen_destroy(world_renderer->game_over_screen);
   free(world_renderer);
 }
 
@@ -163,4 +167,8 @@ void world_renderer_render(WorldRenderer *renderer, World *world,
   Player *self_player = world_get_self_player(world);
   health_bar_update(renderer->health_bar, player_get_health(self_player));
   health_bar_draw(renderer->health_bar, renderer->sdl_renderer);
+
+  if(player_get_health(self_player) <= 0) {
+    game_over_screen_draw(renderer->game_over_screen);
+  }
 }

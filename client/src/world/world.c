@@ -18,6 +18,7 @@ typedef struct {
   Level *level;
   WorldRenderer *renderer;
   Collision *collision;
+  int game_over;
 } World;
 
 World *world_create(SDL_Renderer *renderer) {
@@ -30,6 +31,7 @@ World *world_create(SDL_Renderer *renderer) {
       entity_list_create(2048, (void (*)(void *))projectile_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
+  world->game_over = 0;
   collision_add_collider(world->collision, player_get_collider(world->self));
   return world; 
 }
@@ -152,6 +154,9 @@ void world_on_collision(World *world, Collider *a, Collider *b) {
     Projectile *projectile = collider_get_target(b);
     Player *player = collider_get_target(a);
     player_decrement_health(player, 17);
+    if(player_get_health(player) <= 0) {
+      world->game_over=1;
+    }
     world_remove_projectile(world, projectile);
     world_remove_collider(world, b);
   }
@@ -159,6 +164,9 @@ void world_on_collision(World *world, Collider *a, Collider *b) {
     Projectile *projectile = collider_get_target(a);
     Player *player = collider_get_target(b);
     player_decrement_health(player, 17);
+    if(player_get_health(player) <= 0) {
+      world->game_over=1;
+    }
     world_remove_projectile(world, projectile);
     world_remove_collider(world, a);
   }
