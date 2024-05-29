@@ -2,6 +2,11 @@
 #include "../projectile/projectile.h"
 #include "../ui/sprite.h"
 #include "../ui/spritesheet.h"
+#include "../ui/health.h"
+#include "../ui/element.h"
+#include "../ui/text.h"
+#include "../ui/canvas.h"
+#include "../ui/health.h"
 #include "SDL2/SDL_render.h"
 #include "level_common.h"
 #include "world.h"
@@ -12,6 +17,7 @@ typedef struct {
   SpriteSheet *player_sprite_sheet;
   SpriteSheet *mob_sprite_sheet;
   Sprite *projectile_sprite;
+  HealthBar *health_bar;
 } WorldRenderer;
 
 WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
@@ -23,11 +29,13 @@ WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
       spritesheet_create(renderer, "assets/sprites/mob.png", 96 / 3, 128 / 4);
   world_renderer->projectile_sprite =
       sprite_create(renderer, "assets/sprites/projectile.png");
+    world_renderer->health_bar = health_bar_create(renderer);
   return world_renderer;
 }
 
 void world_renderer_destroy(WorldRenderer *world_renderer) {
   spritesheet_destroy(world_renderer->player_sprite_sheet);
+  health_bar_destroy(world_renderer->health_bar);
   free(world_renderer);
 }
 
@@ -151,4 +159,8 @@ void world_renderer_render(WorldRenderer *renderer, World *world,
   world_renderer_render_projectiles(renderer, world, pivot);
   world_renderer_render_mobs(renderer, world, pivot);
   world_renderer_render_players(renderer, world, pivot);
+
+  Player *self_player = world_get_self_player(world);
+  health_bar_update(renderer->health_bar, player_get_health(self_player));
+  health_bar_draw(renderer->health_bar, renderer->sdl_renderer);
 }

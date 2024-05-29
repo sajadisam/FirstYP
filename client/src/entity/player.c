@@ -129,6 +129,16 @@ void player_set_coord(Player *player, int x, int y) {
 void player_decrement_health(Player *player, int amount) {
   player->health -=amount;
 }
+
 int player_get_health(const Player *player) {
   return player->health;
+}
+
+void player_set_health(Player* player, int amount) {
+  player->health = 100;
+}
+
+void player_respawn(Player *player, int x, int y) {
+    player->health = 100;
+    player_set_coord(player, x, y);
 }

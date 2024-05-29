@@ -6,6 +6,7 @@
 #include "ui/canvas.h"
 #include "ui/menu.h"
 #include "window/window.h"
+#include "ui/game_over.h"
 #include "world/world.h"
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
@@ -17,7 +18,9 @@ typedef struct {
   Canvas *canvas;
   Network *network;
   Menu *menu;
+  GameOverScreen *game_over_screen;
   int in_menu;
+  int game_over;
 } Game;
 
 Window *get_game_window(const Game *game) { return game->window; }
@@ -32,6 +35,16 @@ int window_event_callback(SDL_Event const *event, void *arg) {
 
   Player *player = world_get_self_player(game->world);
   PlayerFlag flags = get_player_flags(player);
+
+  if(game->game_over) {
+    if(event->type == SDL_KEYDOWN && event->key.keysym.sym==SDLK_RETURN) {
+      Player *self_player = world_get_self_player(game->world);
+      player_respawn(self_player, 1500, 1500);
+      player_set_health(player, 100);
+      game->game_over = 0;
+    }
+    return 0;
+  }
 
   if (game->in_menu) {
     int action = menu_handle_event(game->menu, (SDL_Event *)event);
@@ -107,7 +120,10 @@ Game *game_create(Window *window) {
   world_load_level(game->world, "dungeon", "dungeon");
   game->network = NULL;
   game->menu = menu_create(get_window_renderer(window));
+  game->game_over_screen = game_over_screen_create(get_window_renderer(window), "Press Enter to respawn", "assets/fonts/sans.ttf", 48);
   game->in_menu = 1;
+  game->game_over = 0;
+  
   return game;
 }
 
@@ -120,9 +136,16 @@ void game_destroy(Game *game) {
 }
 
 void game_update(Game *game, float dt) {
+  if(game->game_over) {
+    return;
+  }
   if (!game->in_menu) {
     world_update(game->world, dt);
     network_update(game->network, game);
+  }
+  Player *self_player = world_get_self_player(game->world);
+  if(player_get_health(self_player) <= 0) {
+    game->game_over = 1;
   }
 }
 
@@ -133,6 +156,13 @@ Player *game_get_self_player(Game *game) {
 void game_render(Game *game) {
   SDL_Renderer *renderer = get_window_renderer(game->window);
   SDL_RenderClear(renderer);
+  if(game->game_over) {
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    game_over_screen_draw(game->game_over_screen);
+    SDL_RenderPresent(renderer);
+    return;
+  }
 
   if (game->in_menu) {
     menu_render(game->menu, renderer);

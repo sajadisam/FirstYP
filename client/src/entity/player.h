@@ -30,5 +30,6 @@ void player_move_on_flags(Player *player, float dt);
 
 void player_decrement_health(Player *player, int amount);
 int player_get_health(const Player *player);
-
+void player_respawn(Player *player, int x, int y);
+void player_set_health(Player* player, int amount);
 #endif // PLAYER_H
