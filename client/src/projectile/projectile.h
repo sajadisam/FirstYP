@@ -8,8 +8,9 @@
 typedef struct Projectile Projectile;
 
 Projectile *projectile_create(float speed, float damage,
-                              SDL_Point collision_size, void *entity,
-                              ProjectileType type, SDL_FPoint direction,
+                              SDL_Point collision_size, SDL_Point coord,
+                              void *entity, ProjectileType type,
+                              SDL_FPoint direction,
                               ProjectileDestroyFunc destroy);
 void projectile_destroy(Projectile *projectile);
 void projectile_update(Projectile *projectile, float dt);

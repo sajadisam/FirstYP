@@ -10,6 +10,7 @@ typedef struct {
   ProjectileType type;
   Collider *collider;
   ProjectileDestroyFunc destroy;
+  SDL_Point startcoord;
 } Projectile;
 
 void projectile_on_collision(Projectile *projectile, Collider *collided) {
@@ -19,18 +20,17 @@ void projectile_on_collision(Projectile *projectile, Collider *collided) {
 }
 
 Projectile *projectile_create(float speed, float damage,
-                              SDL_Point collision_size, void *entity,
-                              ProjectileType type, SDL_FPoint direction,
+                              SDL_Point collision_size, SDL_Point coord,
+                              void *entity, ProjectileType type,
+                              SDL_FPoint direction,
                               ProjectileDestroyFunc destroy) {
   Projectile *projectile = malloc(sizeof(Projectile));
   projectile->speed = speed;
   projectile->damage = damage;
-  SDL_Point coordinate = entity_get_coord(entity);
-  projectile->collider =
-      collider_create((SDL_Rect){coordinate.x, coordinate.y, collision_size.x,
-                                 collision_size.y},
-                      COLLIDER_PROJECTILE, entity,
-                      (void (*)(void *, void *))projectile_on_collision);
+  projectile->collider = collider_create(
+      (SDL_Rect){coord.x, coord.y, collision_size.x, collision_size.y},
+      COLLIDER_PROJECTILE, entity,
+      (void (*)(void *, void *))projectile_on_collision);
   projectile->direction = direction;
   projectile->destroy = destroy;
   return projectile;
