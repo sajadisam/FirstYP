@@ -126,10 +126,11 @@ void world_render_projectile(WorldRenderer *world_renderer,
   Entity *entity = projectile_get_entity(projectile);
   SDL_Point coord = entity_get_coord(entity);
   SDL_Point size = collider_get_size(collider);
-  SDL_Rect projected = (SDL_Rect){coord.x, coord.y, size.x, size.y};
+
+  SDL_Rect projected = (SDL_Rect){coord.x, coord.y, size.x * 2, size.y * 2};
   world_renderer_project_coord(&projected, pivot);
   sprite_draw(world_renderer->sdl_renderer, world_renderer->projectile_sprite,
-              &(SDL_Rect){0, 0, size.x, size.y}, &projected);
+              &(SDL_Rect){0, 0, size.x * 2, size.y * 2}, &projected);
 }
 
 void world_renderer_render_projectiles(WorldRenderer *world_renderer,
