@@ -28,4 +28,7 @@ PlayerFlag player_get_flags(Player *player);
 void player_set_flags(Player *player, PlayerFlag flags);
 void player_move_on_flags(Player *player, float dt);
 
+void player_decrement_health(Player *player, int amount);
+int player_get_health(const Player *player);
+
 #endif // PLAYER_H

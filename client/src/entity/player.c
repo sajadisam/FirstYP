@@ -14,6 +14,7 @@ typedef struct {
   float speed;
   Animation *move_animation;
   Collider *collider;
+  int health;
 } Player;
 
 void player_on_collision(Player *playerA, Collider *b) {
@@ -31,6 +32,7 @@ Player *player_create() {
   player->flags = PLAYER_FLAG_NONE;
   player->speed = 2.0f * 60.0f;
   player->move_animation = animation_create(0.075f, 3);
+  player->health = 100;
 
   SDL_Point coordinate = entity_get_coord(player->entity);
   player->collider = collider_create(
@@ -121,4 +123,12 @@ void player_set_flags(Player *player, PlayerFlag flags) {
 
 void player_set_coord(Player *player, int x, int y) {
   entity_set_coord(player->entity, (SDL_Point){x, y});
+}
+
+
+void player_decrement_health(Player *player, int amount) {
+  player->health -=amount;
+}
+int player_get_health(const Player *player) {
+  return player->health;
 }

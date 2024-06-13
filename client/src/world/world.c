@@ -31,7 +31,7 @@ World *world_create(SDL_Renderer *renderer) {
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   collision_add_collider(world->collision, player_get_collider(world->self));
-  return world;
+  return world; 
 }
 
 void world_destroy(World *world) {
@@ -150,11 +150,15 @@ void world_on_collision(World *world, Collider *a, Collider *b) {
   ColliderType typeB = collider_get_type(b);
   if (typeA == COLLIDER_PLAYER && typeB == COLLIDER_PROJECTILE) {
     Projectile *projectile = collider_get_target(b);
+    Player *player = collider_get_target(a);
+    player_decrement_health(player, 17);
     world_remove_projectile(world, projectile);
     world_remove_collider(world, b);
   }
   if (typeB == COLLIDER_PLAYER && typeA == COLLIDER_PROJECTILE) {
     Projectile *projectile = collider_get_target(a);
+    Player *player = collider_get_target(b);
+    player_decrement_health(player, 17);
     world_remove_projectile(world, projectile);
     world_remove_collider(world, a);
   }
