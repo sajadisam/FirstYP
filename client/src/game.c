@@ -1,4 +1,5 @@
-#include "debug.h"
+#include "../../lib/debug.h"
+#include "../../lib/misc.h"
 #include "entity/mob.h"
 #include "entity/player.h"
 #include "net/network.h"

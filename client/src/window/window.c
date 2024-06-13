@@ -1,4 +1,5 @@
-#include "../debug.h"
+#include "../../../lib/debug.h"
+#include "../../../lib/misc.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
 #include <SDL2/SDL_image.h>
@@ -14,11 +15,6 @@ typedef struct {
 
 typedef int (*EventLoopCallback)(const SDL_Event *event, void *);
 
-void on_sdl_error() {
-  ERR("%s\n", SDL_GetError());
-  SDL_Quit();
-  exit(5);
-}
 Window *window_create(const char *name, const int width, const int height) {
   SDL_Window *pWindow =
       SDL_CreateWindow(name, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,

@@ -56,6 +56,9 @@ OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.
 FOLDER := projectile
 OBJECT_FILES := $(OBJECT_FILES) $(patsubst $(SRC_DIR)/$(FOLDER)/%.c,$(OBJ_DIR)%.o,$(wildcard $(SRC_DIR)$(FOLDER)/*.c))
 
+# lib
+OBJECT_FILES := $(OBJECT_FILES) $(patsubst ../lib/%.c,$(OBJ_DIR)%.o,$(wildcard ./../lib/*.c))
+
 # Build the intermediate files
 $(OBJ_DIR)%.o: $(SRC_DIR)%.c
 	$(CC) $(CFLAGS) $^ -o $@

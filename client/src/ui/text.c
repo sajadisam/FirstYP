@@ -1,4 +1,4 @@
-#include "../debug.h"
+#include "../../../lib/debug.h"
 #include "element.h"
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_ttf.h>

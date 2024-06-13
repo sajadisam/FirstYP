@@ -1,5 +1,5 @@
+#include "../../../lib/debug.h"
 #include "../../../lib/network_constants.h"
-#include "../debug.h"
 #include "../entity/player.h"
 #include "../game.h"
 #include "../world/world.h"
