@@ -69,6 +69,7 @@ int window_event_callback(SDL_Event const *event, void *arg) {
     Projectile *tomatoProjectile = tomatoprojectile_get_projectile(tomato);
     world_add_projectile(game->world, tomatoProjectile);
     world_add_collider(game->world, projectile_get_collider(tomatoProjectile));
+    network_send_projectile(game, tomatoProjectile);
   } break;
   case SDL_MOUSEMOTION:
     set_window_mouse_coordinate(get_game_window(game),

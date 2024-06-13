@@ -14,13 +14,26 @@ typedef struct {
   TCPsocket socket;
   SDLNet_SocketSet socket_set;
 } Network;
-
 void network_send(Network *network, const char *data) {
   int len = strlen(data);
   int sent = SDLNet_TCP_Send(network->socket, data, len);
   if (sent < len) {
     WARN("Failed to send message\n");
   }
+}
+
+void network_send_projectile(Game *game, Projectile *projectile) {
+  char buffer[1024];
+  SDL_Point coord = projectile_get_start_coordinate(projectile);
+  SDL_FPoint direction = projectile_get_direction(projectile);
+  Player *self = game_get_self_player(game);
+
+  sprintf(buffer, "%d %d %d %d %f %f ", OPCODE_PROJECTILE, player_get_id(self),
+          coord.x, coord.y, direction.x, direction.y);
+
+  Network *network = game_get_network(game);
+  if (network->socket)
+    SDLNet_TCP_Send(network->socket, buffer, 1024);
 }
 
 Network *network_create(const char *host, int port) {

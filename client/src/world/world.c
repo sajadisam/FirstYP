@@ -27,7 +27,7 @@ World *world_create(SDL_Renderer *renderer) {
   world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
   world->collision = collision_create();
   world->projectiles =
-      entity_list_create(20, (void (*)(void *))projectile_destroy);
+      entity_list_create(2048, (void (*)(void *))projectile_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   collision_add_collider(world->collision, player_get_collider(world->self));

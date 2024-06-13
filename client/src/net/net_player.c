@@ -1,5 +1,6 @@
 #include "../../../lib/network_constants.h"
 #include "../entity/player.h"
+#include "../projectile//tomato.h"
 #include "../world/world.h"
 #include <stdio.h>
 
@@ -21,6 +22,16 @@ void net_player_player_move(World *world, int id, int x, int y, int flags) {
     player_set_flags(player, flags);
     player_set_coord(player, x, y);
   }
+}
+
+void net_add_projectile(World *world, int id, int x, int y, float directionX,
+                        float directionY) {
+  printf("%d, %d, %d, %f %f \n", id, x, y, directionX, directionY);
+  TomatoProjectile *tomato = tomatoprojectile_create(
+      (SDL_FPoint){directionX, directionY}, (SDL_Point){x, y});
+  Projectile *projectile = tomatoprojectile_get_projectile(tomato);
+  world_add_projectile(world, projectile);
+  world_add_collider(world, projectile_get_collider(projectile));
 }
 
 void net_player_connected(World *world, int id) {
@@ -51,6 +62,13 @@ void net_player_react(World *world, const char *message) {
     int id, x, y, flags;
     sscanf(message, "%d %d %d %d %d ", &opcode, &id, &x, &y, &flags);
     net_player_player_move(world, id, x, y, flags);
+  } break;
+  case OPCODE_PROJECTILE: {
+    int id, x, y;
+    float directionX, directionY;
+    sscanf(message, "%d %d %d %d %f %f ", &opcode, &id, &x, &y, &directionX,
+           &directionY);
+    net_add_projectile(world, id, x, y, directionX, directionY);
   } break;
   }
 }
