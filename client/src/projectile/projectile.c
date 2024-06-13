@@ -61,7 +61,9 @@ void projectile_set_coord(Projectile *projectile, SDL_Point coord) {
 }
 
 void projectile_update(Projectile *projectile, float dt) {
-  // Entity *entity = collider_get_entity(projectile->collider);
-  // SDL_Point coord = entity_get_coord(projectile->collider);
-  // Linear interpolate against the direction
+  Entity *entity = collider_get_entity(projectile->collider);
+  SDL_Point coord = entity_get_coord(entity);
+  coord.x += projectile->direction.x * projectile->speed * dt;
+  coord.y += projectile->direction.y * projectile->speed * dt;
+  projectile_set_coord(projectile, coord);
 }
