@@ -74,8 +74,7 @@ void world_projectile_update(World *world, float dt) {
     SDL_Point coord = projectile_get_coord(projectile);
     int deltaX = coord.x - start.x;
     int deltaY = coord.y - start.y;
-    if ((deltaX > 1000 || deltaX < -1000) ||
-        (deltaY > 1000 || deltaY < -1000)) {
+    if ((deltaX > 500 || deltaX < -500) || (deltaY > 500 || deltaY < -500)) {
       world_remove_projectile(world, projectile);
       projectile_count--;
     }

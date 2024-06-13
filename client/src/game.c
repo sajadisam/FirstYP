@@ -1,13 +1,10 @@
-#include "../../lib/debug.h"
 #include "../../lib/misc.h"
-#include "entity/mob.h"
 #include "entity/player.h"
 #include "net/network.h"
 #include "projectile/projectile.h"
 #include "projectile/tomato.h"
 #include "ui/canvas.h"
 #include "ui/menu.h"
-#include "ui/text.h"
 #include "window/window.h"
 #include "world/world.h"
 #include <SDL2/SDL_timer.h>

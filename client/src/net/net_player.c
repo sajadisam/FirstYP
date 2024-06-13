@@ -13,6 +13,7 @@ void net_player_disconnect(World *world, int id) {
 void net_player_join(World *world, int id) {
   Player *player = player_create();
   player_set_id(player, id);
+  world_add_collider(world, player_get_collider(player));
   world_add_player(world, player);
 }
 
@@ -26,7 +27,6 @@ void net_player_player_move(World *world, int id, int x, int y, int flags) {
 
 void net_add_projectile(World *world, int id, int x, int y, float directionX,
                         float directionY) {
-  printf("%d, %d, %d, %f %f \n", id, x, y, directionX, directionY);
   TomatoProjectile *tomato = tomatoprojectile_create(
       (SDL_FPoint){directionX, directionY}, (SDL_Point){x, y});
   Projectile *projectile = tomatoprojectile_get_projectile(tomato);
