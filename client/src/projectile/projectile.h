@@ -9,14 +9,14 @@ typedef struct Projectile Projectile;
 
 Projectile *projectile_create(float speed, float damage,
                               SDL_Point collision_size, void *entity,
-                              ProjectileType type, SDL_Point direction,
+                              ProjectileType type, SDL_FPoint direction,
                               ProjectileDestroyFunc destroy);
 void projectile_destroy(Projectile *projectile);
 void projectile_update(Projectile *projectile, float dt);
 
 float projectile_get_speed(Projectile *projectile);
 float projectile_get_damage(Projectile *projectile);
-SDL_Point projectile_get_direction(Projectile *projectile);
+SDL_FPoint projectile_get_direction(Projectile *projectile);
 Entity *projectile_get_entity(Projectile *projectile);
 ProjectileType projectile_get_type(Projectile *projectile);
 Collider *projectile_get_collider(Projectile *projectile);

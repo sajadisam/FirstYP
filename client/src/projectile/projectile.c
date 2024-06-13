@@ -1,11 +1,12 @@
 #include "../collider/collider.h"
 #include "../entity/entity.h"
 #include "projectile_common.h"
+#include <stdio.h>
 
 typedef struct {
   float speed;
   float damage;
-  SDL_Point direction;
+  SDL_FPoint direction;
   ProjectileType type;
   Collider *collider;
   ProjectileDestroyFunc destroy;
@@ -19,7 +20,7 @@ void projectile_on_collision(Projectile *projectile, Collider *collided) {
 
 Projectile *projectile_create(float speed, float damage,
                               SDL_Point collision_size, void *entity,
-                              ProjectileType type, SDL_Point direction,
+                              ProjectileType type, SDL_FPoint direction,
                               ProjectileDestroyFunc destroy) {
   Projectile *projectile = malloc(sizeof(Projectile));
   projectile->speed = speed;
@@ -30,6 +31,7 @@ Projectile *projectile_create(float speed, float damage,
                                  collision_size.y},
                       COLLIDER_PROJECTILE, entity,
                       (void (*)(void *, void *))projectile_on_collision);
+  projectile->direction = direction;
   projectile->destroy = destroy;
   return projectile;
 }
@@ -43,7 +45,7 @@ float projectile_get_speed(Projectile *projectile) { return projectile->speed; }
 float projectile_get_damage(Projectile *projectile) {
   return projectile->damage;
 }
-SDL_Point projectile_get_direction(Projectile *projectile) {
+SDL_FPoint projectile_get_direction(Projectile *projectile) {
   return projectile->direction;
 }
 Entity *projectile_get_entity(Projectile *projectile) {

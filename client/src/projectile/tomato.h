@@ -5,7 +5,8 @@
 #include <SDL2/SDL_rect.h>
 typedef struct TomatoProjectile TomatoProjectile;
 
-TomatoProjectile *tomatoprojectile_create(SDL_Point direction, SDL_Point coord);
+TomatoProjectile *tomatoprojectile_create(SDL_FPoint direction,
+                                          SDL_Point coord);
 void tomatoprojectile_destroy(TomatoProjectile *tomato);
 Projectile *tomatoprojectile_get_projectile(TomatoProjectile *tomato);
 
