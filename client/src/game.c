@@ -34,52 +34,6 @@ int window_event_callback(SDL_Event const *event, void *arg) {
   }
   Player *player = world_get_self_player(game->world);
   PlayerFlag flags = get_player_flags(player);
-  switch (event->type) {
-  case SDL_MOUSEBUTTONDOWN: {
-    float middleX = window_get_width(game->window) / 2.0f;
-    float middleY = window_get_height(game->window) / 2.0f;
-    float x = event->motion.x - middleX;
-    float y = event->motion.y - middleY;
-    int length = vector_length(x, y);
-    SDL_FPoint direction = (SDL_FPoint){x / length, y / length};
-    x = direction.x * 50;
-    y = direction.y * 50;
-    SDL_Point pivot = player_get_coord(player);
-    x += pivot.x;
-    y += pivot.y;
-
-    TomatoProjectile *tomato =
-        tomatoprojectile_create(direction, (SDL_Point){x, y});
-    Projectile *tomatoProjectile = tomatoprojectile_get_projectile(tomato);
-    world_add_projectile(game->world, tomatoProjectile);
-    world_add_collider(game->world, projectile_get_collider(tomatoProjectile));
-  } break;
-  case SDL_MOUSEMOTION: {
-    set_window_mouse_coordinate(get_game_window(game),
-                                (SDL_Point){event->motion.x, event->motion.y});
-  } break;
-  case SDL_KEYDOWN: {
-    SDL_Scancode code = event->key.keysym.scancode;
-    if (code == SDL_SCANCODE_UP || code == SDL_SCANCODE_W)
-      flags |= PLAYER_FLAG_MOVE_UP;
-    if (code == SDL_SCANCODE_DOWN || code == SDL_SCANCODE_S)
-      flags |= PLAYER_FLAG_MOVE_DOWN;
-    if (code == SDL_SCANCODE_RIGHT || code == SDL_SCANCODE_D)
-      flags |= PLAYER_FLAG_MOVE_RIGHT;
-    if (code == SDL_SCANCODE_LEFT || code == SDL_SCANCODE_A)
-      flags |= PLAYER_FLAG_MOVE_LEFT;
-  } break;
-  case SDL_KEYUP: {
-    SDL_Scancode code = event->key.keysym.scancode;
-    if (code == SDL_SCANCODE_UP || code == SDL_SCANCODE_W)
-      flags &= ~PLAYER_FLAG_MOVE_UP;
-    if (code == SDL_SCANCODE_DOWN || code == SDL_SCANCODE_S)
-      flags &= ~PLAYER_FLAG_MOVE_DOWN;
-    if (code == SDL_SCANCODE_RIGHT || code == SDL_SCANCODE_D)
-      flags &= ~PLAYER_FLAG_MOVE_RIGHT;
-    if (code == SDL_SCANCODE_LEFT || code == SDL_SCANCODE_A)
-      flags &= ~PLAYER_FLAG_MOVE_LEFT;
-
   if (game->in_menu) {
     int action = menu_handle_event(game->menu, (SDL_Event *)event);
     if (action == 1) {
@@ -95,6 +49,27 @@ int window_event_callback(SDL_Event const *event, void *arg) {
     Player *player = world_get_self_player(game->world);
     PlayerFlag flags = get_player_flags(player);
     switch (event->type) {
+
+    case SDL_MOUSEBUTTONDOWN: {
+      float middleX = window_get_width(game->window) / 2.0f;
+      float middleY = window_get_height(game->window) / 2.0f;
+      float x = event->motion.x - middleX;
+      float y = event->motion.y - middleY;
+      int length = vector_length(x, y);
+      SDL_FPoint direction = (SDL_FPoint){x / length, y / length};
+      x = direction.x * 50;
+      y = direction.y * 50;
+      SDL_Point pivot = player_get_coord(player);
+      x += pivot.x;
+      y += pivot.y;
+
+      TomatoProjectile *tomato =
+          tomatoprojectile_create(direction, (SDL_Point){x, y});
+      Projectile *tomatoProjectile = tomatoprojectile_get_projectile(tomato);
+      world_add_projectile(game->world, tomatoProjectile);
+      world_add_collider(game->world,
+                         projectile_get_collider(tomatoProjectile));
+    } break;
     case SDL_MOUSEMOTION:
       set_window_mouse_coordinate(
           get_game_window(game), (SDL_Point){event->motion.x, event->motion.y});
