@@ -1,4 +1,6 @@
 #include "../entity/mob.h"
+#include "../projectile/projectile.h"
+#include "../ui/sprite.h"
 #include "../ui/spritesheet.h"
 #include "SDL2/SDL_render.h"
 #include "level_common.h"
@@ -9,6 +11,7 @@ typedef struct {
   SDL_Renderer *sdl_renderer;
   SpriteSheet *player_sprite_sheet;
   SpriteSheet *mob_sprite_sheet;
+  Sprite *projectile_sprite;
 } WorldRenderer;
 
 WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
@@ -18,6 +21,8 @@ WorldRenderer *world_renderer_create(SDL_Renderer *renderer) {
       spritesheet_create(renderer, "assets/sprites/player.png", 64, 64);
   world_renderer->mob_sprite_sheet =
       spritesheet_create(renderer, "assets/sprites/mob.png", 96 / 3, 128 / 4);
+  world_renderer->projectile_sprite =
+      sprite_create(renderer, "assets/sprites/projectile.png");
   return world_renderer;
 }
 
@@ -73,7 +78,6 @@ void world_renderer_render_player(WorldRenderer *renderer, Player *player,
       .y = coord.y,
       .w = spritesheet_get_cellwidth(renderer->player_sprite_sheet),
       .h = spritesheet_get_cellheight(renderer->player_sprite_sheet)};
-
   world_renderer_project_coord(&rect, pivot);
   int draw_frame = player_get_draw_frame_id(player);
   int cell_x =
@@ -116,12 +120,34 @@ void world_renderer_render_mobs(WorldRenderer *renderer, World *world,
   }
 }
 
+void world_render_projectile(WorldRenderer *world_renderer,
+                             Projectile *projectile, SDL_Point pivot) {
+  Collider *collider = projectile_get_collider(projectile);
+  Entity *entity = projectile_get_entity(projectile);
+  SDL_Point coord = entity_get_coord(entity);
+  SDL_Point size = collider_get_size(collider);
+  SDL_Rect projected = (SDL_Rect){coord.x, coord.y, size.x, size.y};
+  world_renderer_project_coord(&projected, pivot);
+  sprite_draw(world_renderer->sdl_renderer, world_renderer->projectile_sprite,
+              &(SDL_Rect){0, 0, size.x, size.y}, &projected);
+}
+
+void world_renderer_render_projectiles(WorldRenderer *world_renderer,
+                                       World *world, SDL_Point pivot) {
+  EntityList *projectiles = world_get_projectiles_list(world);
+  int projectiles_size = entity_list_size(projectiles);
+  for (int i = 0; i < projectiles_size; i++) {
+    Projectile *projectile = entity_list_get(projectiles, i);
+    world_render_projectile(world_renderer, projectile, pivot);
+  }
+}
+
 void world_renderer_render(WorldRenderer *renderer, World *world,
                            SDL_Point pivot) {
   Level *level = world_get_level(world);
-  if (level) {
+  if (level)
     world_renderer_render_level(renderer, level, pivot);
-  }
+  world_renderer_render_projectiles(renderer, world, pivot);
   world_renderer_render_mobs(renderer, world, pivot);
   world_renderer_render_players(renderer, world, pivot);
 }
