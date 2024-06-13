@@ -5,7 +5,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_rect.h>
 #include <stdbool.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -20,7 +19,7 @@ typedef struct {
 void player_on_collision(Player *playerA, Collider *b) {
   if (collider_get_type(b) == COLLIDER_PLAYER) {
     Player *playerB = (Player *)b;
-    printf("Player %d got collided!\n", playerA->id);
+    // printf("Player %d got collided!\n", playerA->id);
   }
 }
 

@@ -123,7 +123,7 @@ void world_renderer_render_mobs(WorldRenderer *renderer, World *world,
 void world_render_projectile(WorldRenderer *world_renderer,
                              Projectile *projectile, SDL_Point pivot) {
   Collider *collider = projectile_get_collider(projectile);
-  Entity *entity = projectile_get_entity(projectile);
+  Entity *entity = collider_get_entity(collider);
   SDL_Point coord = entity_get_coord(entity);
   SDL_Point size = collider_get_size(collider);
 

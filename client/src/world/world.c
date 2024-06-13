@@ -27,7 +27,7 @@ World *world_create(SDL_Renderer *renderer) {
   world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
   world->collision = collision_create();
   world->projectiles =
-      entity_list_create(1024, (void (*)(void *))projectile_destroy);
+      entity_list_create(2048, (void (*)(void *))projectile_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   collision_add_collider(world->collision, player_get_collider(world->self));
@@ -61,6 +61,10 @@ void world_load_level(World *world, char const *tilesetName,
                               tilesetPath, levelPath);
 }
 
+void world_remove_projectile(World *world, Projectile *projectile) {
+  entity_list_remove(world->projectiles, projectile);
+}
+
 void world_update(World *world, float dt) {
   int player_count = entity_list_size(world->player_list);
   for (int i = 0; i < player_count; i++) {
@@ -69,7 +73,6 @@ void world_update(World *world, float dt) {
   }
   player_move_on_flags(world->self, dt);
   player_update(world->self, dt);
-
   int projectile_count = entity_list_size(world->projectiles);
   for (int i = 0; i < projectile_count; i++) {
     Projectile *projectile = entity_list_get(world->projectiles, i);
@@ -80,10 +83,6 @@ void world_update(World *world, float dt) {
 
 void world_add_projectile(World *world, Projectile *projectile) {
   entity_list_add(world->projectiles, projectile);
-}
-
-void world_remove_projectile(World *world, Projectile *projectile) {
-  entity_list_remove(world->projectiles, projectile);
 }
 
 void world_add_collider(World *world, Collider *collider) {
@@ -130,7 +129,14 @@ int world_add_mob(World *world, void *mob) {
   return entity_list_add(world->mob_list, mob);
 }
 
-void world_on_collision(World *world, Collider *a, Collider *b) {}
+void world_on_collision(World *world, Collider *a, Collider *b) {
+  ColliderType typeA = collider_get_type(a);
+  ColliderType typeB = collider_get_type(b);
+  if (typeA == COLLIDER_PLAYER && typeB == COLLIDER_PROJECTILE) {
+    Projectile *projectile = collider_get_target(b);
+    world_remove_projectile(world, projectile);
+  }
+}
 Player *world_get_mob(World *world, int id) {
   return entity_list_get(world->mob_list, id);
 }

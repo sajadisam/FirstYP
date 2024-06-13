@@ -14,7 +14,7 @@ TomatoProjectile *tomatoprojectile_create(SDL_FPoint direction,
   TomatoProjectile *tomato = malloc(sizeof(TomatoProjectile));
   SDL_Point size = (SDL_Point){.x = 32 / 2, .y = 32 / 2};
   tomato->projectile =
-      projectile_create(150.0f, 10.0f, size, coord, tomato, PROJECTILE_TOMATO,
+      projectile_create(230.0f, 10.0f, size, coord, tomato, PROJECTILE_TOMATO,
                         direction, (void (*)(void *))tomatoprojectile_destroy);
   projectile_set_coord(tomato->projectile, coord);
   return tomato;
