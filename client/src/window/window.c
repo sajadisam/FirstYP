@@ -1,4 +1,3 @@
-#include "../../../lib/debug.h"
 #include "../../../lib/misc.h"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_events.h>
@@ -53,13 +52,12 @@ int window_event_loop(const Window *window, const EventLoopCallback callback,
                       void *arg) {
   SDL_Event event;
   while (SDL_PollEvent(&event) > 0) {
-    if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) {
-      Window *w = (Window *) window;
-      if(w->is_fullscreen) {
+    if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) {
+      Window *w = (Window *)window;
+      if (w->is_fullscreen) {
         SDL_SetWindowFullscreen(w->m_Window, 0);
         w->is_fullscreen = 0;
-      }
-      else {
+      } else {
         SDL_SetWindowFullscreen(w->m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
         w->is_fullscreen = 1;
       }
