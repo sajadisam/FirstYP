@@ -65,6 +65,22 @@ void world_remove_projectile(World *world, Projectile *projectile) {
   entity_list_remove(world->projectiles, projectile);
 }
 
+void world_projectile_update(World *world, float dt) {
+  int projectile_count = entity_list_size(world->projectiles);
+  for (int i = 0; i < projectile_count; i++) {
+    Projectile *projectile = entity_list_get(world->projectiles, i);
+    projectile_update(projectile, dt);
+    SDL_Point start = projectile_get_start_coordinate(projectile);
+    SDL_Point coord = projectile_get_coord(projectile);
+    int deltaX = coord.x - start.x;
+    int deltaY = coord.y - start.y;
+    if ((deltaX > 1000 || deltaX < -1000) ||
+        (deltaY > 1000 || deltaY < -1000)) {
+      world_remove_projectile(world, projectile);
+    }
+  }
+}
+
 void world_update(World *world, float dt) {
   int player_count = entity_list_size(world->player_list);
   for (int i = 0; i < player_count; i++) {
@@ -73,11 +89,7 @@ void world_update(World *world, float dt) {
   }
   player_move_on_flags(world->self, dt);
   player_update(world->self, dt);
-  int projectile_count = entity_list_size(world->projectiles);
-  for (int i = 0; i < projectile_count; i++) {
-    Projectile *projectile = entity_list_get(world->projectiles, i);
-    projectile_update(projectile, dt);
-  }
+  world_projectile_update(world, dt);
   collision_update(world, world->collision);
 }
 
