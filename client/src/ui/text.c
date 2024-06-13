@@ -18,6 +18,15 @@ typedef struct {
 void text_set_text(Text *text, const char *data);
 void text_draw(Text *text);
 
+void text_update(Text *text) {
+  SDL_Surface *surface =
+      TTF_RenderText_Solid(text->font, text->text, text->color);
+  text->texture = SDL_CreateTextureFromSurface(text->renderer, surface);
+  SDL_Rect prev = element_get_rect(text->element);
+  element_set_rect(text->element,
+                   (SDL_Rect){prev.x, prev.y, surface->w, surface->h});
+}
+
 Text *text_create(SDL_Renderer *renderer, const char *text,
                   const char *fontPath, int size) {
   Text *txt = malloc(sizeof(Text));
@@ -47,15 +56,6 @@ void text_destroy(Text *text) {
   if (text->texture)
     SDL_DestroyTexture(text->texture);
   free(text);
-}
-
-void text_update(Text *text) {
-  SDL_Surface *surface =
-      TTF_RenderText_Solid(text->font, text->text, text->color);
-  text->texture = SDL_CreateTextureFromSurface(text->renderer, surface);
-  SDL_Rect prev = element_get_rect(text->element);
-  element_set_rect(text->element,
-                   (SDL_Rect){prev.x, prev.y, surface->w, surface->h});
 }
 
 Element *text_get_element(Text *text) { return text->element; }

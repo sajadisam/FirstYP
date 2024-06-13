@@ -11,6 +11,7 @@ typedef struct {
   SDL_Window *m_Window;
   SDL_Renderer *m_Renderer;
   SDL_Point mouse_coordinate;
+  int is_fullscreen;
 } Window;
 
 typedef int (*EventLoopCallback)(const SDL_Event *event, void *);
@@ -35,6 +36,7 @@ Window *window_create(const char *name, const int width, const int height) {
   window->m_Window = pWindow;
   window->m_Renderer = pRenderer;
   window->mouse_coordinate = (SDL_Point){-1, -1};
+  window->is_fullscreen = 0;
   return window;
 }
 
@@ -51,6 +53,17 @@ int window_event_loop(const Window *window, const EventLoopCallback callback,
                       void *arg) {
   SDL_Event event;
   while (SDL_PollEvent(&event) > 0) {
+    if(event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_F11) {
+      Window *w = (Window *) window;
+      if(w->is_fullscreen) {
+        SDL_SetWindowFullscreen(w->m_Window, 0);
+        w->is_fullscreen = 0;
+      }
+      else {
+        SDL_SetWindowFullscreen(w->m_Window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+        w->is_fullscreen = 1;
+      }
+    }
     int callbackResult = (int)callback(&event, arg);
     if (callbackResult) {
       return callbackResult;
