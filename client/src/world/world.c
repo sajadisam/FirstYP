@@ -3,6 +3,7 @@
 #include "../entity/entity_list.h"
 #include "../entity/mob.h"
 #include "../entity/player.h"
+#include "../projectile/projectile.h"
 #include "SDL2/SDL_render.h"
 #include "level.h"
 #include "world_renderer.h"
@@ -13,6 +14,7 @@ typedef struct {
   Player *self;
   EntityList *player_list;
   EntityList *mob_list;
+  EntityList *projectiles;
   Level *level;
   WorldRenderer *renderer;
   Collision *collision;
@@ -22,8 +24,10 @@ World *world_create(SDL_Renderer *renderer) {
   World *world = malloc(sizeof(World));
   world->player_list = entity_list_create(32, (void (*)(void *))player_destroy);
   world->self = player_create();
-  world->collision = collision_create();
   world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
+  world->collision = collision_create();
+  world->projectiles =
+      entity_list_create(1024, (void (*)(void *))projectile_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   collision_add_collider(world->collision, player_get_collider(world->self));
@@ -65,7 +69,21 @@ void world_update(World *world, float dt) {
   }
   player_move_on_flags(world->self, dt);
   player_update(world->self, dt);
-  collision_update(world->collision);
+
+  int projectile_count = entity_list_size(world->projectiles);
+  for (int i = 0; i < projectile_count; i++) {
+    Projectile *projectile = entity_list_get(world->projectiles, i);
+    projectile_update(projectile, dt);
+  }
+  collision_update(world, world->collision);
+}
+
+void world_add_projectile(World *world, Projectile *projectile) {
+  entity_list_add(world->projectiles, projectile);
+}
+
+void world_remove_projectile(World *world, Projectile *projectile) {
+  entity_list_remove(world->projectiles, projectile);
 }
 
 void world_add_collider(World *world, Collider *collider) {
@@ -112,10 +130,14 @@ int world_add_mob(World *world, void *mob) {
   return entity_list_add(world->mob_list, mob);
 }
 
+void world_on_collision(World *world, Collider *a, Collider *b) {}
 Player *world_get_mob(World *world, int id) {
   return entity_list_get(world->mob_list, id);
 }
 
 EntityList *world_get_player_list(World *world) { return world->player_list; }
+EntityList *world_get_projectiles_list(World *world) {
+  return world->projectiles;
+}
 
 EntityList *world_get_mob_list(World *world) { return world->mob_list; }
