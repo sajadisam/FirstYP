@@ -28,6 +28,7 @@ void collision_update(World *world, Collision *collision) {
       Collider *b = entity_list_get(collision->colliders, x);
       if (collider_execute(a, b)) {
         world_on_collision(world, a, b);
+        len--;
       }
     }
   }

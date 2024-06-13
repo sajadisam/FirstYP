@@ -27,7 +27,7 @@ World *world_create(SDL_Renderer *renderer) {
   world->mob_list = entity_list_create(32, (void (*)(void *))mob_destroy);
   world->collision = collision_create();
   world->projectiles =
-      entity_list_create(2048, (void (*)(void *))projectile_destroy);
+      entity_list_create(20, (void (*)(void *))projectile_destroy);
   world->level = NULL;
   world->renderer = world_renderer_create(renderer);
   collision_add_collider(world->collision, player_get_collider(world->self));
@@ -77,6 +77,7 @@ void world_projectile_update(World *world, float dt) {
     if ((deltaX > 1000 || deltaX < -1000) ||
         (deltaY > 1000 || deltaY < -1000)) {
       world_remove_projectile(world, projectile);
+      projectile_count--;
     }
   }
 }
@@ -147,6 +148,12 @@ void world_on_collision(World *world, Collider *a, Collider *b) {
   if (typeA == COLLIDER_PLAYER && typeB == COLLIDER_PROJECTILE) {
     Projectile *projectile = collider_get_target(b);
     world_remove_projectile(world, projectile);
+    world_remove_collider(world, b);
+  }
+  if (typeB == COLLIDER_PLAYER && typeA == COLLIDER_PROJECTILE) {
+    Projectile *projectile = collider_get_target(a);
+    world_remove_projectile(world, projectile);
+    world_remove_collider(world, a);
   }
 }
 Player *world_get_mob(World *world, int id) {

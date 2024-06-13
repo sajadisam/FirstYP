@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <malloc.h>
+#include <stdio.h>
 
 typedef struct {
   void **storage;
@@ -55,7 +56,7 @@ void entity_list_remove(EntityList *entityList, void *entity) {
 }
 
 void *entity_list_get(EntityList *entityList, int index) {
-  // assert(index < entityList->size);
+  assert(index < entityList->size);
   return entityList->storage[index];
 }
 
