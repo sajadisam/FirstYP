@@ -5,7 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <time.h>
-
+#undef main
 int main() {
   srand(time(NULL));
   if (SDL_Init(0) == -1) {
