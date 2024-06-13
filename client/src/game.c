@@ -11,7 +11,6 @@
 #include "world/world.h"
 #include <SDL2/SDL_timer.h>
 #include <SDL2/SDL_ttf.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -34,15 +33,20 @@ int window_event_callback(SDL_Event const *event, void *arg) {
   PlayerFlag flags = get_player_flags(player);
   switch (event->type) {
   case SDL_MOUSEBUTTONDOWN: {
-    int x = event->motion.x;
-    int y = event->motion.y;
+    float middleX = window_get_width(game->window) / 2.0f;
+    float middleY = window_get_height(game->window) / 2.0f;
+    float x = event->motion.x - middleX;
+    float y = event->motion.y - middleY;
+    int length = vector_length(x, y);
+    SDL_FPoint direction = (SDL_FPoint){x / length, y / length};
+    x = direction.x * 50;
+    y = direction.y * 50;
     SDL_Point pivot = player_get_coord(player);
-    pivot.x -= window_get_width(game->window) / 2;
-    pivot.y -= window_get_height(game->window) / 2;
     x += pivot.x;
     y += pivot.y;
+
     TomatoProjectile *tomato =
-        tomatoprojectile_create((SDL_Point){0, 1}, (SDL_Point){x, y});
+        tomatoprojectile_create(direction, (SDL_Point){x, y});
     Projectile *tomatoProjectile = tomatoprojectile_get_projectile(tomato);
     world_add_projectile(game->world, tomatoProjectile);
     world_add_collider(game->world, projectile_get_collider(tomatoProjectile));
