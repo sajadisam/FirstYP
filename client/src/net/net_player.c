@@ -13,7 +13,6 @@ void net_player_disconnect(World *world, int id) {
 void net_player_join(World *world, int id) {
   Player *player = player_create();
   player_set_id(player, id);
-  world_add_collider(world, player_get_collider(player));
   world_add_player(world, player);
 }
 

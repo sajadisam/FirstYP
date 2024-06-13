@@ -69,6 +69,8 @@ void world_projectile_update(World *world, float dt) {
   int projectile_count = entity_list_size(world->projectiles);
   for (int i = 0; i < projectile_count; i++) {
     Projectile *projectile = entity_list_get(world->projectiles, i);
+    if (!projectile)
+      continue;
     projectile_update(projectile, dt);
     SDL_Point start = projectile_get_start_coordinate(projectile);
     SDL_Point coord = projectile_get_coord(projectile);
@@ -142,6 +144,8 @@ int world_add_mob(World *world, void *mob) {
 }
 
 void world_on_collision(World *world, Collider *a, Collider *b) {
+  if (!a || !b)
+    return;
   ColliderType typeA = collider_get_type(a);
   ColliderType typeB = collider_get_type(b);
   if (typeA == COLLIDER_PLAYER && typeB == COLLIDER_PROJECTILE) {
